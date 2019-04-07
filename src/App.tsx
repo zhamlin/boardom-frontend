@@ -1,20 +1,21 @@
 import * as React from 'react';
-import './App.css';
 
-import logo from './logo.svg';
+import 'bulma/css/bulma.css';
 
 class App extends React.Component {
   public render() {
     return (
-      <div className="App">
-        <header className="App-header">
-          <img src={logo} className="App-logo" alt="logo" />
-          <h1 className="App-title">Welcome to React</h1>
-        </header>
-        <p className="App-intro">
-          To get started, edit <code>src/App.tsx</code> and save to reload.
-        </p>
-      </div>
+    <div className="columns is-centered">
+        <div className="column is-half" style={{paddingTop: '1%'}}>
+            <div className="box is-primary">
+                <article className="media">
+                    <h1 className="title">
+                        Hello World
+                    </h1>
+                </article>
+            </div>
+        </div>
+    </div>
     );
   }
 }
