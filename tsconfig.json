@@ -17,7 +17,9 @@
     "importHelpers": true,
     "strictNullChecks": true,
     "suppressImplicitAnyIndexErrors": true,
-    "noUnusedLocals": true
+    "noUnusedLocals": false,
+    "incremental": true,
+    "skipLibCheck": true
   },
   "exclude": [
     "node_modules",
