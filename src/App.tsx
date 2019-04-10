@@ -3,6 +3,8 @@ import * as React from 'react';
 import 'bulma/css/bulma.css';
 import './App.css'
 
+import List from './components/list_item'
+
 class App extends React.Component {
   public render() {
     return (
@@ -14,24 +16,8 @@ class App extends React.Component {
         </nav>
         <nav className="navbar board">board choice here</nav>
         <div className="lists">
-            <div className="list">
-                <h3 className="list-title">List title</h3>
-                <ul className="list-items">
-                    <li> item1 </li>
-                    <li> item1 </li>
-                    <li> item1 </li>
-                    <li> item1 </li>
-                    <li> item1 </li>
-                    <li> item1 </li>
-                    <li> item1 </li>
-                    <li> item1 </li>
-                    <li> item1 </li>
-                    <li> item1 </li>
-                    <li> item1 </li>
-                    <li> item1 </li>
-                </ul>
-                <a className="list-button button is-light">Add card</a>
-            </div>
+            <List name="Todohow long can we go we will never know, lets keep going" enthusiasmLevel={3} />
+            <List name="Other" enthusiasmLevel={3} />
         </div>
     </div>
     );
