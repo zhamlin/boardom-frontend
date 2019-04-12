@@ -1,9 +1,5 @@
 import * as React from 'react';
 
-import { StoreState } from "../store";
-
-import { DECREMENT_ENTHUSIASM, INCREMENT_ENTHUSIASM } from '../constants/index';
-
 export interface Props {
   name: string;
   enthusiasmLevel?: number;
