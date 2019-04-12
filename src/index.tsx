@@ -4,8 +4,15 @@ import App from './App';
 import './index.css';
 import registerServiceWorker from './registerServiceWorker';
 
+import { Provider } from 'react-redux';
+import {makeStore} from './store';
+
+const store = makeStore()
+
 ReactDOM.render(
-  <App />,
-  document.getElementById('root') as HTMLElement
+  <Provider store={store}>
+    <App />
+  </Provider>,
+  document.getElementById('root'),
 );
 registerServiceWorker();

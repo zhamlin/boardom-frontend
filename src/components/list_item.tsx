@@ -1,28 +1,29 @@
 import * as React from 'react';
 
+import { StoreState } from "../store";
+
+import { DECREMENT_ENTHUSIASM, INCREMENT_ENTHUSIASM } from '../constants/index';
+
 export interface Props {
   name: string;
   enthusiasmLevel?: number;
+  onIncrement?: () => void;
 }
 
-class List extends React.Component<Props, object> {
-  public render() {
-    const { name, enthusiasmLevel = 1 } = this.props;
-
+function List({ name, enthusiasmLevel = 1, onIncrement}: Props) {
     if (enthusiasmLevel <= 0) {
       throw new Error('You could be a little more enthusiastic. :D');
     }
 
     return (
-      <div className="list">
+    <div className="list">
         <h3 className="list-title">{ name }</h3>
         <ul className="list-items">
-            <li>one</li>
+            <li>{ getExclamationMarks(enthusiasmLevel) }</li>
         </ul>
-        <a className="list-button button is-light">Add card</a>
+        <a onClick={onIncrement} className="list-button button is-light">Add card</a>
     </div>
     );
-  }
 }
 
 export default List;
