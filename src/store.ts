@@ -19,5 +19,8 @@ export function makeStore() {
     components: {},
     enthusiasmLevel: 1,
     languageName: "typescript",
-  });
+  },
+   (window as any).__REDUX_DEVTOOLS_EXTENSION__ &&
+    (window as any).__REDUX_DEVTOOLS_EXTENSION__()
+  );
 }
