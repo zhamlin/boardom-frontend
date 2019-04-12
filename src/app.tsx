@@ -1,7 +1,7 @@
 import * as React from 'react';
 
 import 'bulma/css/bulma.css';
-import './App.css'
+import './app.css'
 
 import List from './containers/list_item'
 
