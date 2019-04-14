@@ -1,26 +1,30 @@
-import {Action, createStore} from 'redux';
-import {EnthusiasmAction} from './actions/index';
+import {createStore} from 'redux';
+import {State as ListState} from './components/list/reducers';
 import reducer from './reducer';
 
-export type Action = EnthusiasmAction
+// export interface StoreState {
+//     languageName: string;
+//     enthusiasmLevel: number;
+//     components?: Dictionary<any>;
+// }
 
-interface Dictionary<T> {
-    [Key: string]: T;
-}
+// export interface Store {
+//   lists: Dictionary<ListState>
+//   // lists: {
+//   //   enthusiasmLevel: number,
+//   //   name: string;
+//   // }
+// }
 
-export interface StoreState {
-    languageName: string;
-    enthusiasmLevel: number;
-    components: Dictionary<any>;
+export class Storage {
+    public lists: any;
 }
 
 export function makeStore() {
-  return createStore(reducer, {
-    components: {},
-    enthusiasmLevel: 1,
-    languageName: "typescript",
-  },
-   (window as any).__REDUX_DEVTOOLS_EXTENSION__ &&
-    (window as any).__REDUX_DEVTOOLS_EXTENSION__()
-  );
+    const store = new Storage();
+    store.lists = {};
+    return createStore(reducer, { lists: { data: {} } },
+        (window as any).__REDUX_DEVTOOLS_EXTENSION__ &&
+        (window as any).__REDUX_DEVTOOLS_EXTENSION__()
+    );
 }

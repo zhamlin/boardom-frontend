@@ -3,23 +3,26 @@ import * as React from 'react';
 import 'bulma/css/bulma.css';
 import './app.css'
 
-import List from './containers/list_item'
+import {createList} from './components/list/actions'
+import Lists from './components/lists/component'
+import {store} from './index'
+
+const addList = () => {
+    store.dispatch(createList('test'));
+};
 
 class App extends React.Component {
   public render() {
     return (
-    <div className="ui">
+    <>
         <nav className="navbar app is-danger">
-            <a className="navbar-item">
+            <a onClick={addList} className="navbar-item">
               Home
             </a>
         </nav>
         <nav className="navbar board">board choice here</nav>
-        <div className="lists">
-            <List />
-            <List />
-        </div>
-    </div>
+        <Lists />
+    </>
     );
   }
 }
