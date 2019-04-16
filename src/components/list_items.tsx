@@ -45,9 +45,7 @@ const mapDispatchToProps: DispatchProps = {
   onClick: () => {}
 };
 
-export default React.memo(
-  connect(
-    makeMapState,
-    mapDispatchToProps
-  )(ListItem)
-);
+export default connect(
+  makeMapState,
+  mapDispatchToProps
+)(ListItem);
