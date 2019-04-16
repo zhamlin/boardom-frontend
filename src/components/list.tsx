@@ -1,15 +1,28 @@
-import * as React from "react";
+import { connect } from "react-redux";
+import { createCard, updateListName } from "../constants/actions";
+import { State } from "../stores";
 
-export interface Props {
-  name: string;
+import * as React from "react";
+import { LocalProps as ListItemProps } from "./list_items";
+import ListItem from "./list_items";
+
+export interface LocalProps {
   id: string;
 }
 
-export interface Actions {
+export interface StateProps {
+  name: string;
+  items: ListItemProps[];
+}
+
+export interface ActionProps {
+  onAddCard: (id: string, name: string) => void;
   onListNameChange: (id: string, name: string) => void;
 }
 
-const ListName: React.FC<Props & Actions> = ({
+export type Props = StateProps & LocalProps & ActionProps;
+
+const ListName: React.FC<Pick<Props, "id" | "name" | "onListNameChange">> = ({
   id,
   name,
   onListNameChange
@@ -46,14 +59,16 @@ const ListName: React.FC<Props & Actions> = ({
   );
 };
 
-// tslint:disable-next-line:no-console
-console.log(ListName.name);
-
-export const List: React.FC<Props & Actions> = ({
+export const List: React.FC<Props> = ({
   id,
+  items,
   name,
+  onAddCard,
   onListNameChange
 }) => {
+  const handleAddCard = () => {
+    onAddCard(id, "card");
+  };
   return (
     <div className="list">
       <div className="list-header level is-mobile">
@@ -63,9 +78,33 @@ export const List: React.FC<Props & Actions> = ({
         </span>
       </div>
       <ul className="list-items">
-        <li>Test</li>
+        {Object.entries(items).map(([_, i]) => {
+          return <ListItem id={i.id} key={i.id} />;
+        })}
       </ul>
-      <a className="list-button button is-light">Add card</a>
+      <a onClick={handleAddCard} className="list-button button is-light">
+        Add card
+      </a>
     </div>
   );
 };
+
+function mapStateToProps(state: State, props: LocalProps): StateProps {
+  const items = state.lists!.cards.items().filter(i => i.listID === props.id);
+  return {
+    items,
+    name: state.lists!.items.data[props.id].name
+  };
+}
+
+let nextCardID = 0;
+const mapDispatchToProps: ActionProps = {
+  onAddCard: (id: string, name: string) =>
+    createCard({ id: (nextCardID++).toString(), name, listID: id }),
+  onListNameChange: (id: string, name: string) => updateListName({ id, name })
+};
+
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(List);

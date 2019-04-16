@@ -5,7 +5,7 @@ import "./index.css";
 import registerServiceWorker from "./registerServiceWorker";
 
 import { Provider } from "react-redux";
-import { makeStore } from "./store";
+import { makeStore } from "./stores";
 
 export const store = makeStore();
 

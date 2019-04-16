@@ -1,34 +1,54 @@
 import * as React from "react";
 import {
-  Actions as ListActions,
-  List,
-  Props as ListProps
+  ActionProps as ListActions,
+  LocalProps as ListProps
 } from "../components/list";
+import List from "../components/list";
 
-export interface Props {
-  lists: Record<string, ListProps>;
+import { connect } from "react-redux";
+import { createList } from "../constants/actions";
+import { State } from "../stores";
+
+export interface StateProps {
+  lists: ListProps[];
+  defaultListName: string;
 }
 
-export interface Actions extends ListActions {}
+export interface ActionProps {
+  addList: (name: string) => void;
+}
 
-export const Lists: React.FC<Props & Actions> = ({
-  lists,
-  onListNameChange
-}) => {
+export type Props = StateProps & ActionProps;
+
+export const Lists: React.FC<Props> = ({ lists, defaultListName, addList }) => {
+  const onAddList = () => {
+    addList(defaultListName);
+  };
   return (
     <div className="lists">
-      {Object.keys(lists).map((key: string) => {
-        lists.test = { name: "", id: "" };
-        const list = lists[key];
-        return (
-          <List
-            onListNameChange={onListNameChange}
-            id={list.id}
-            name={list.name}
-            key={list.id}
-          />
-        );
+      {lists.map(l => {
+        return <List id={l.id} key={l.id} />;
       })}
+      <a className="button" onClick={onAddList}>
+        New List
+      </a>
     </div>
   );
 };
+
+function mapStateToProps(state: State): StateProps {
+  return {
+    defaultListName: "list",
+    lists: state.lists!.items.items()
+  };
+}
+
+let nextListID = 0;
+const mapDispatchToProps: ActionProps = {
+  addList: (name: string) => createList({ id: (nextListID++).toString(), name })
+};
+
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(Lists);

@@ -78,6 +78,7 @@ body {
   align-content: start;
   padding: 0 0.6rem 0.5rem;
   overflow-y: auto;
+  overflow-x: hidden;
 }
 
 .list-items li {
