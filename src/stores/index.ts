@@ -7,7 +7,7 @@ interface IDAble {
 }
 
 export class RecordItem<T extends IDAble> {
-  public readonly data: Readonly<Record<string, T>>;
+  private readonly data: Readonly<Record<string, T>>;
 
   constructor(data = {}) {
     this.data = data;
@@ -15,6 +15,10 @@ export class RecordItem<T extends IDAble> {
 
   public items = (): T[] => {
     return Object.values(this.data);
+  };
+
+  public get = (id: string): T | null => {
+    return this.data[id];
   };
 
   public update = (obj: T): RecordItem<T> => {
