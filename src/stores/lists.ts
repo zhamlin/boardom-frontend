@@ -21,22 +21,22 @@ export interface State {
 export default function reducer(
   state: Readonly<State> | null | undefined,
   action: Actions
-) {
+): State | null {
   if (!state) {
     return null;
   }
 
   switch (action.type) {
     case UPDATE_LIST_NAME: {
-      return { ...state, lists: state.items.update(action.payload) };
+      return { ...state, items: state.items.update(action.payload) };
     }
 
     case CREATE_CARD: {
-      return { ...state, items: state.cards.update(action.payload) };
+      return { ...state, cards: state.cards.update(action.payload) };
     }
 
     case CREATE_LIST: {
-      return { ...state, lists: state.items.update(action.payload) };
+      return { ...state, items: state.items.update(action.payload) };
     }
 
     default:
