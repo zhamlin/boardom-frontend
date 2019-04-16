@@ -30,7 +30,7 @@ export const ListItem: React.FC<Props> = ({ id, name }) => {
 
 function mapStateToProps(state: State, props: LocalProps): StateProps {
   return {
-    name: state.lists!.items.data[props.id].name
+    name: state.lists!.cards.get(props.id)!.name
   };
 }
 

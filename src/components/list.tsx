@@ -93,7 +93,7 @@ function mapStateToProps(state: State, props: LocalProps): StateProps {
   const items = state.lists!.cards.items().filter(i => i.listID === props.id);
   return {
     items,
-    name: state.lists!.items.data[props.id].name
+    name: state.lists!.items.get(props.id)!.name
   };
 }
 
