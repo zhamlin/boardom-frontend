@@ -1,24 +1,22 @@
 import * as React from "react";
-import {
-  ActionProps as ListActions,
-  LocalProps as ListProps
-} from "../components/list";
+import { LocalProps as ListProps } from "../components/list";
 import List from "../components/list";
 
 import { connect } from "react-redux";
 import { createList } from "../constants/actions";
 import { State } from "../stores";
+import { getAllListsInstance } from "../stores/lists/selectors";
 
 export interface StateProps {
   lists: ListProps[];
   defaultListName: string;
 }
 
-export interface ActionProps {
+export interface DispatchProps {
   addList: (name: string) => void;
 }
 
-export type Props = StateProps & ActionProps;
+export type Props = StateProps & DispatchProps;
 
 export const Lists: React.FC<Props> = ({ lists, defaultListName, addList }) => {
   const onAddList = () => {
@@ -36,19 +34,22 @@ export const Lists: React.FC<Props> = ({ lists, defaultListName, addList }) => {
   );
 };
 
-function mapStateToProps(state: State): StateProps {
-  return {
-    defaultListName: "list",
-    lists: state.lists!.items.items()
+const makeMapState = () => {
+  const getAllLists = getAllListsInstance();
+  return (state: State): StateProps => {
+    return {
+      defaultListName: "list",
+      lists: getAllLists(state).all()
+    };
   };
-}
+};
 
 let nextListID = 0;
-const mapDispatchToProps: ActionProps = {
+const mapDispatchToProps: DispatchProps = {
   addList: (name: string) => createList({ id: (nextListID++).toString(), name })
 };
 
 export default connect(
-  mapStateToProps,
+  makeMapState,
   mapDispatchToProps
 )(Lists);

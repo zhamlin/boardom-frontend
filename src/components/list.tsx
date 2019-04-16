@@ -3,6 +3,10 @@ import { createCard, updateListName } from "../constants/actions";
 import { State } from "../stores";
 
 import * as React from "react";
+import {
+  getAllListCardsInstance,
+  getListNameInstance
+} from "../stores/lists/selectors";
 import { LocalProps as ListItemProps } from "./list_items";
 import ListItem from "./list_items";
 
@@ -15,12 +19,12 @@ export interface StateProps {
   items: ListItemProps[];
 }
 
-export interface ActionProps {
+export interface DispatchProps {
   onAddCard: (id: string, name: string) => void;
   onListNameChange: (id: string, name: string) => void;
 }
 
-export type Props = StateProps & LocalProps & ActionProps;
+export type Props = StateProps & LocalProps & DispatchProps;
 
 const ListName: React.FC<Pick<Props, "id" | "name" | "onListNameChange">> = ({
   id,
@@ -89,22 +93,25 @@ export const List: React.FC<Props> = ({
   );
 };
 
-function mapStateToProps(state: State, props: LocalProps): StateProps {
-  const items = state.lists!.cards.items().filter(i => i.listID === props.id);
-  return {
-    items,
-    name: state.lists!.items.get(props.id)!.name
+const makeMapState = () => {
+  const getListName = getListNameInstance();
+  const getAllListCards = getAllListCardsInstance();
+  return (state: State, props: LocalProps): StateProps => {
+    return {
+      items: getAllListCards(state, props.id).all(),
+      name: getListName(state, props.id)
+    };
   };
-}
+};
 
 let nextCardID = 0;
-const mapDispatchToProps: ActionProps = {
+const mapDispatchToProps: DispatchProps = {
   onAddCard: (id: string, name: string) =>
     createCard({ id: (nextCardID++).toString(), name, listID: id }),
   onListNameChange: (id: string, name: string) => updateListName({ id, name })
 };
 
 export default connect(
-  mapStateToProps,
+  makeMapState,
   mapDispatchToProps
 )(List);
