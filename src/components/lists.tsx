@@ -35,6 +35,9 @@ export const Lists: React.FC<Props> = ({
     addList(defaultListName);
   };
   const handleListDrag = (result: DropResult, provided: ResponderProvided) => {
+    if (result.destination === undefined) {
+      return;
+    }
     listMove(result.source.index, result.destination!.index);
   };
   return (
