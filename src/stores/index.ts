@@ -13,6 +13,10 @@ export class RecordItem<T extends IDAble> {
     this.data = data;
   }
 
+  public order(fn: (a: T, b: T) => number): T[] {
+    return this.all().sort(fn);
+  }
+
   public fromArray(a: T[]): RecordItem<T> {
     const map = a.reduce((m, obj) => {
       m[obj.id] = obj;
@@ -29,8 +33,11 @@ export class RecordItem<T extends IDAble> {
     return this.data[id];
   };
 
-  public update = (obj: T): RecordItem<T> => {
-    return new RecordItem<T>({ ...this.data, [obj.id]: obj });
+  public update = (id: string, obj: Partial<T>): RecordItem<T> => {
+    return new RecordItem<T>({
+      ...this.data,
+      [id]: { ...this.data[id], ...obj }
+    });
   };
 
   public hasID = (id: string): boolean => {

@@ -14,12 +14,9 @@ body {
 }
 
 .lists {
-  overflow-x: scroll;
-}
-
-.lists > div {
   display: flex;
   align-items: start;
+  overflow-x: auto;
   overflow-y: hidden;
   padding: 0.8rem 0.8rem 1.8rem;
   height: calc(100vh - 8.6rem);
@@ -81,7 +78,8 @@ body {
   flex-direction: column;
   align-content: start;
   padding: 0 0.6rem 0.5rem;
-  overflow-y: auto;
+  overflow-x: hidden;
+  overflow-y: hidden;
 }
 
 .list-item {

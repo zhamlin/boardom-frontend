@@ -41,7 +41,7 @@ export const getAllListsInstance = () =>
   createSelector(
     [selectLists],
     (lists: Lists) => {
-      return lists;
+      return lists.order((a, b) => (a.position || 0) - (b.position || 0));
     }
   );
 

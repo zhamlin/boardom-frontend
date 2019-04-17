@@ -1,9 +1,9 @@
 import { connect } from "react-redux";
-import { Draggable } from "react-smooth-dnd";
 import { State } from "../stores";
 import { getCardNameInstance } from "../stores/lists/selectors";
 
 import * as React from "react";
+import { Draggable } from "react-beautiful-dnd";
 
 export interface LocalProps {
   id: string;
@@ -24,10 +24,18 @@ export const ListItem: React.FC<Props> = ({ id, name }) => {
     window.alert(id);
   };
   return (
-    <Draggable key={id}>
-      <li className={"list-item"} onClick={handleOnClick}>
-        {name}
-      </li>
+    <Draggable draggableId={`list-item${id}`} index={Number(0)}>
+      {provided => (
+        <li
+          className={"list-item"}
+          onClick={handleOnClick}
+          ref={provided.innerRef}
+          {...provided.draggableProps}
+          {...provided.dragHandleProps}
+        >
+          {name}
+        </li>
+      )}
     </Draggable>
   );
 };

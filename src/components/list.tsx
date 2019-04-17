@@ -1,9 +1,10 @@
+import { Draggable } from "react-beautiful-dnd";
+import { Droppable } from "react-beautiful-dnd";
 import { connect } from "react-redux";
 import { createCard, updateListName } from "../constants/actions";
 import { State } from "../stores";
 
 import * as React from "react";
-import { Container, Draggable } from "react-smooth-dnd";
 import {
   getAllListCardsInstance,
   getListNameInstance
@@ -13,6 +14,7 @@ import ListItem from "./list_items";
 
 export interface LocalProps {
   id: string;
+  position: number;
 }
 
 export interface StateProps {
@@ -66,6 +68,7 @@ const ListName: React.FC<Pick<Props, "id" | "name" | "onListNameChange">> = ({
 
 export const List: React.FC<Props> = ({
   id,
+  position,
   items,
   name,
   onAddCard,
@@ -75,25 +78,42 @@ export const List: React.FC<Props> = ({
     onAddCard(id, "card");
   };
   return (
-    <Draggable>
-      <div className="list">
-        <div className="list-header level is-mobile">
-          <ListName id={id} name={name} onListNameChange={onListNameChange} />
-          <span className="icon level-right">
-            <i className="fas fa-bars" />
-          </span>
+    <Draggable draggableId={id} index={position}>
+      {provided => (
+        <div
+          className="list"
+          ref={provided.innerRef}
+          {...provided.draggableProps}
+        >
+          <div
+            className="list-header level is-mobile"
+            {...provided.dragHandleProps}
+          >
+            <ListName id={id} name={name} onListNameChange={onListNameChange} />
+            <span className="icon level-right">
+              <i className="fas fa-bars" />
+            </span>
+          </div>
+          <Droppable droppableId={id} type="list-item">
+            {listProvided => (
+              <ul
+                className="list-items"
+                id={"container"}
+                ref={listProvided.innerRef}
+                {...listProvided.droppableProps}
+              >
+                {Object.entries(items).map(([_, i]) => {
+                  return <ListItem id={i.id} key={i.id} />;
+                })}
+                {listProvided.placeholder}
+              </ul>
+            )}
+          </Droppable>
+          <a onClick={handleAddCard} className="list-button button is-light">
+            Add card
+          </a>
         </div>
-        <ul className="list-items" id={"container"}>
-          <Container>
-            {Object.entries(items).map(([_, i]) => {
-              return <ListItem id={i.id} key={i.id} />;
-            })}
-          </Container>
-        </ul>
-        <a onClick={handleAddCard} className="list-button button is-light">
-          Add card
-        </a>
-      </div>
+      )}
     </Draggable>
   );
 };
