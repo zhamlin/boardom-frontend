@@ -78,7 +78,7 @@ export const List: React.FC<Props> = ({
     onAddCard(id, "card");
   };
   return (
-    <Draggable draggableId={id} index={position}>
+    <Draggable draggableId={`list-${id}`} index={position}>
       {provided => (
         <div
           className="list"
@@ -94,7 +94,10 @@ export const List: React.FC<Props> = ({
               <i className="fas fa-bars" />
             </span>
           </div>
-          <Droppable droppableId={id} type="list-item">
+          <Droppable
+            droppableId={`list-items-droppable-${id}`}
+            type="list-item"
+          >
             {listProvided => (
               <ul
                 className="list-items"

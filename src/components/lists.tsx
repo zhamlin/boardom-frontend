@@ -42,7 +42,11 @@ export const Lists: React.FC<Props> = ({
   };
   return (
     <DragDropContext onDragEnd={handleListDrag}>
-      <Droppable droppableId="lists" type="lists" direction="horizontal">
+      <Droppable
+        droppableId="lists-droppable"
+        type="lists"
+        direction="horizontal"
+      >
         {provided => (
           <div
             className="lists"

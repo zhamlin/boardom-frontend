@@ -24,7 +24,7 @@ export const ListItem: React.FC<Props> = ({ id, name }) => {
     window.alert(id);
   };
   return (
-    <Draggable draggableId={`list-item${id}`} index={Number(0)}>
+    <Draggable draggableId={`list-item-${id}`} index={Number(0)}>
       {provided => (
         <li
           className={"list-item"}
