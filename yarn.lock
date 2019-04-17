@@ -6453,7 +6453,7 @@ promise@8.0.1:
   dependencies:
     asap "~2.0.3"
 
-prop-types@^15.6.2, prop-types@^15.7.2:
+prop-types@>=15.6.0, prop-types@^15.6.2, prop-types@^15.7.2:
   version "15.7.2"
   resolved "https://registry.yarnpkg.com/prop-types/-/prop-types-15.7.2.tgz#52c41e75b8c87e72b9d9360e0206b99dcbffa6c5"
   integrity sha512-8QQikdH7//R2vurIJSutZ1smHYTcLpRWEOlHnzcWHmBYrOGUysKwSsrC89BCiFj3CbrfJ/nXFdJepOVrY1GCHQ==
@@ -6723,6 +6723,14 @@ react-scripts-ts@3.1.0:
     whatwg-fetch "2.0.3"
   optionalDependencies:
     fsevents "^1.1.3"
+
+react-smooth-dnd@^0.11.0:
+  version "0.11.0"
+  resolved "https://registry.yarnpkg.com/react-smooth-dnd/-/react-smooth-dnd-0.11.0.tgz#1eaebb8eff632388bd9b2ec1794e376737f97e55"
+  integrity sha512-zo14IBA3MOilZ/DOTD35CwOy1Exh+GWbMXWIsyQVlmrMBi59mc3HupKVGtS/iXb2V8FbmUOMq1csvblI86Uh0w==
+  dependencies:
+    prop-types ">=15.6.0"
+    smooth-dnd "0.12.0"
 
 react@^16.8.6:
   version "16.8.6"
@@ -7350,6 +7358,11 @@ slash@^1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/slash/-/slash-1.0.0.tgz#c41f2f6c39fc16d1cd17ad4b5d896114ae470d55"
   integrity sha1-xB8vbDn8FtHNF61LXYlhFK5HDVU=
+
+smooth-dnd@0.12.0:
+  version "0.12.0"
+  resolved "https://registry.yarnpkg.com/smooth-dnd/-/smooth-dnd-0.12.0.tgz#6d293ebbb653596cb1f439d913c20be216731f6b"
+  integrity sha512-w+/YW1TFram8FW/bYiirRcAGSIdVVjxFRtCBqJ2fkEJpm28zwbdMyXVQCralBUTITMjZp6VHGQJ73UTSIER1lA==
 
 snapdragon-node@^2.0.1:
   version "2.1.1"

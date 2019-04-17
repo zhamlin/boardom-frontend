@@ -1,4 +1,5 @@
 import { connect } from "react-redux";
+import { Draggable } from "react-smooth-dnd";
 import { State } from "../stores";
 import { getCardNameInstance } from "../stores/lists/selectors";
 
@@ -23,9 +24,11 @@ export const ListItem: React.FC<Props> = ({ id, name }) => {
     window.alert(id);
   };
   return (
-    <>
-      <li onClick={handleOnClick}>{name}</li>
-    </>
+    <Draggable key={id}>
+      <li className={"list-item"} onClick={handleOnClick}>
+        {name}
+      </li>
+    </Draggable>
   );
 };
 

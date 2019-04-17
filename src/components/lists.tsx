@@ -1,4 +1,5 @@
 import * as React from "react";
+import { Container, Draggable } from "react-smooth-dnd";
 import { LocalProps as ListProps } from "../components/list";
 import List from "../components/list";
 
@@ -24,12 +25,14 @@ export const Lists: React.FC<Props> = ({ lists, defaultListName, addList }) => {
   };
   return (
     <div className="lists">
-      {lists.map(l => {
-        return <List id={l.id} key={l.id} />;
-      })}
-      <a className="button" onClick={onAddList}>
-        New List
-      </a>
+      <Container orientation={"horizontal"} dragHandleSelector={".list"}>
+        {lists.map(l => {
+          return <List id={l.id} key={l.id} />;
+        })}
+        <a className="button" onClick={onAddList}>
+          New List
+        </a>
+      </Container>
     </div>
   );
 };

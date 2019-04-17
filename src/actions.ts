@@ -1,12 +1,12 @@
-interface Action<T> {
+export interface Action<T> {
   type: T;
 }
 
-interface PayloadAction<T, P> extends Action<T> {
+export interface PayloadAction<T, P> extends Action<T> {
   payload: P;
 }
 
-interface ErrorAction<T, E> extends Action<T> {
+export interface ErrorAction<T, E> extends Action<T> {
   error: E;
 }
 

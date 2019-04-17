@@ -1,5 +1,5 @@
 import { combineReducers, createStore } from "redux";
-import { List, ListItem, State as ListsState } from "./lists/reducer";
+import { State as ListsState } from "./lists/reducer";
 import lists from "./lists/reducer";
 
 interface IDAble {
@@ -34,7 +34,7 @@ export class RecordItem<T extends IDAble> {
   };
 
   public hasID = (id: string): boolean => {
-    return this.data.hasOwnProperty(id);
+    return id in this.data;
   };
 }
 
@@ -47,15 +47,9 @@ const rootReducer = combineReducers<State>({
 });
 
 export function makeStore() {
-  const store: Readonly<State> = {
-    lists: {
-      cards: new RecordItem<ListItem>(),
-      items: new RecordItem<List>()
-    }
-  };
   return createStore(
     rootReducer,
-    store,
+    {},
     (window as any).__REDUX_DEVTOOLS_EXTENSION__ &&
       (window as any).__REDUX_DEVTOOLS_EXTENSION__()
   );

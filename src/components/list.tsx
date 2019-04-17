@@ -3,6 +3,7 @@ import { createCard, updateListName } from "../constants/actions";
 import { State } from "../stores";
 
 import * as React from "react";
+import { Container, Draggable } from "react-smooth-dnd";
 import {
   getAllListCardsInstance,
   getListNameInstance
@@ -74,22 +75,26 @@ export const List: React.FC<Props> = ({
     onAddCard(id, "card");
   };
   return (
-    <div className="list">
-      <div className="list-header level is-mobile">
-        <ListName id={id} name={name} onListNameChange={onListNameChange} />
-        <span className="icon level-right">
-          <i className="fas fa-bars" />
-        </span>
+    <Draggable>
+      <div className="list">
+        <div className="list-header level is-mobile">
+          <ListName id={id} name={name} onListNameChange={onListNameChange} />
+          <span className="icon level-right">
+            <i className="fas fa-bars" />
+          </span>
+        </div>
+        <ul className="list-items" id={"container"}>
+          <Container>
+            {Object.entries(items).map(([_, i]) => {
+              return <ListItem id={i.id} key={i.id} />;
+            })}
+          </Container>
+        </ul>
+        <a onClick={handleAddCard} className="list-button button is-light">
+          Add card
+        </a>
       </div>
-      <ul className="list-items">
-        {Object.entries(items).map(([_, i]) => {
-          return <ListItem id={i.id} key={i.id} />;
-        })}
-      </ul>
-      <a onClick={handleAddCard} className="list-button button is-light">
-        Add card
-      </a>
-    </div>
+    </Draggable>
   );
 };
 
