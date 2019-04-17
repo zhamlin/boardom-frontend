@@ -1,3 +1,7 @@
+export interface BaseAction {
+  type: any;
+}
+
 export interface Action<T> {
   type: T;
 }

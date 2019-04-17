@@ -5,7 +5,7 @@ import {
   UPDATE_LIST_NAME
 } from "../../constants";
 import { Actions } from "../../constants/actions";
-import { RecordItem } from "../index";
+import { Indexable, RecordItem } from "../index";
 
 export interface ListItem {
   id: string;
@@ -24,18 +24,23 @@ export type Lists = RecordItem<List>;
 
 export interface State {
   items: Lists;
+  items_position: Indexable<List>;
   cards: ListItems;
 }
 
 export default function reducer(
   state: Readonly<State> = {
     cards: new RecordItem<ListItem>(),
-    items: new RecordItem<List>()
+    items: new RecordItem<List>(),
+    items_position: new Indexable<List>()
   },
   action: Actions
 ): State {
   switch (action.type) {
     case MOVE_LIST: {
+      // find current list
+      // find list to move
+      // find all inbetween, and shift correct direction
       const { currentPosition, newPosition } = action.payload;
       const toMove = state.items
         .all()

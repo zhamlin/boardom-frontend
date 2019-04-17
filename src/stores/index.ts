@@ -6,6 +6,19 @@ interface IDAble {
   id: string;
 }
 
+export class Indexable<T extends IDAble> {
+  public readonly items: Record<number, string>;
+
+  constructor(items: Record<number, string> = {}) {
+    this.items = items;
+  }
+
+  public swap(to: number, from: number): void {}
+  public set(id: string, position: number): Indexable<T> {
+    return new Indexable<T>(this.items);
+  }
+}
+
 export class RecordItem<T extends IDAble> {
   private readonly data: Readonly<Record<string, T>>;
 
