@@ -1,7 +1,7 @@
 import { Draggable } from "react-beautiful-dnd";
 import { Droppable } from "react-beautiful-dnd";
 import { connect } from "react-redux";
-import { createCard, updateListName } from "../constants/actions";
+import { createCard, moveCard, updateListName } from "../constants/actions";
 import { State } from "../stores";
 
 import * as React from "react";
@@ -78,7 +78,7 @@ export const List: React.FC<Props> = ({
     onAddCard(id, "card");
   };
   return (
-    <Draggable draggableId={`list-${id}`} index={position}>
+    <Draggable key={id} draggableId={`list-${id}`} index={position} type="list">
       {provided => (
         <div
           className="list"
@@ -95,8 +95,9 @@ export const List: React.FC<Props> = ({
             </span>
           </div>
           <Droppable
-            droppableId={`list-items-droppable-${id}`}
+            droppableId={`list-${id}`}
             type="list-item"
+            direction="vertical"
           >
             {listProvided => (
               <ul
@@ -105,8 +106,10 @@ export const List: React.FC<Props> = ({
                 ref={listProvided.innerRef}
                 {...listProvided.droppableProps}
               >
-                {Object.entries(items).map(([_, i]) => {
-                  return <ListItem id={i.id} key={i.id} />;
+                {items.map(i => {
+                  return (
+                    <ListItem id={i.id} key={i.id} position={i.position} />
+                  );
                 })}
                 {listProvided.placeholder}
               </ul>
@@ -126,16 +129,15 @@ const makeMapState = () => {
   const getAllListCards = getAllListCardsInstance();
   return (state: State, props: LocalProps): StateProps => {
     return {
-      items: getAllListCards(state, props.id).all(),
+      items: getAllListCards(state, props.id),
       name: getListName(state, props.id)
     };
   };
 };
 
-let nextCardID = 0;
 const mapDispatchToProps: DispatchProps = {
   onAddCard: (id: string, name: string) =>
-    createCard({ id: (nextCardID++).toString(), name, listID: id }),
+    createCard({ id: "", name, listID: id }),
   onListNameChange: (id: string, name: string) => updateListName({ id, name })
 };
 

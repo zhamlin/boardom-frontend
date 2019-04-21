@@ -1,17 +1,23 @@
 import {
   CREATE_CARD,
   CREATE_LIST,
+  MOVE_CARD,
   MOVE_LIST,
   UPDATE_LIST_NAME
 } from "../../constants";
 import { Actions } from "../../constants/actions";
-import { Indexable, RecordItem } from "../index";
+import { orderRecords, RecordItem } from "../index";
 
-export interface ListItem {
-  id: string;
-  listID: string;
-  name: string;
-  position: number;
+export class ListItem {
+  public id: string;
+  public listID: string;
+  public name: string;
+  public position: number;
+
+  public getPosition = (): number => this.position;
+  public setPosition = (p: number): void => {
+    this.position = p;
+  };
 }
 export type ListItems = RecordItem<ListItem>;
 
@@ -24,43 +30,75 @@ export type Lists = RecordItem<List>;
 
 export interface State {
   items: Lists;
-  items_position: Indexable<List>;
   cards: ListItems;
 }
 
+export interface Positionable {
+  getPosition: () => number;
+  setPosition: (p: number) => void;
+}
+
+let cardID = 0;
+const listID = 0;
 export default function reducer(
   state: Readonly<State> = {
     cards: new RecordItem<ListItem>(),
-    items: new RecordItem<List>(),
-    items_position: new Indexable<List>()
+    items: new RecordItem<List>()
   },
   action: Actions
 ): State {
   switch (action.type) {
-    case MOVE_LIST: {
-      // find current list
-      // find list to move
-      // find all inbetween, and shift correct direction
-      const { currentPosition, newPosition } = action.payload;
-      const toMove = state.items
-        .all()
-        .filter(l => l.position === currentPosition)
-        .slice(-1)[0];
+    case MOVE_CARD: {
+      const { source, destination, id } = action.payload;
+      if (source.listID === destination.listID) {
+        const items = state.cards
+          .all()
+          .filter(c => c.listID === source.listID)
+          .sort((a, b) => a.position - b.position);
+        const [removed] = items.splice(source.index, 1);
+        items.splice(destination.index, 0, removed);
 
-      const other = state.items
-        .all()
-        .filter(l => l.position === newPosition)
-        .slice(-1)[0];
-
-      if (other === undefined || toMove === undefined) {
-        return { ...state };
+        return {
+          ...state,
+          cards: new RecordItem<ListItem>({
+            ...state.cards.data,
+            ...orderRecords(items, "position").data
+          })
+        };
       }
+
+      const sourceListCards = state.cards
+        .all()
+        .filter(c => c.listID === source.listID)
+        .sort((a, b) => a.position - b.position);
+      sourceListCards.splice(source.index, 1);
+
+      const card = state.cards.get(id)!;
+      const destListCards = state.cards
+        .all()
+        .filter(c => c.listID === destination.listID)
+        .sort((a, b) => a.position - b.position);
+      destListCards.splice(destination.index, 0, card);
+      card.listID = destination.listID;
 
       return {
         ...state,
-        items: state.items
-          .update(other.id, { position: currentPosition })
-          .update(toMove.id, { position: newPosition })
+        cards: new RecordItem<ListItem>({
+          ...state.cards.data,
+          ...orderRecords(sourceListCards, "position").data,
+          ...orderRecords(destListCards, "position").data
+        })
+      };
+    }
+    case MOVE_LIST: {
+      const { currentPosition, newPosition } = action.payload;
+      const items = state.items.all().sort((a, b) => a.position - b.position);
+      const [removed] = items.splice(currentPosition, 1);
+      items.splice(newPosition, 0, removed);
+
+      return {
+        ...state,
+        items: orderRecords(items, "position")
       };
     }
 
@@ -70,20 +108,28 @@ export default function reducer(
         items: state.items.update(action.payload.id, action.payload)
       };
     }
-
     case CREATE_CARD: {
+      const id = (cardID++).toString();
+      action.payload.id = id;
+      const { listID } = action.payload;
       return {
         ...state,
-        cards: state.cards.update(action.payload.id, action.payload)
+        cards: state.cards.update(id, {
+          ...action.payload,
+          position: state.cards.all().filter(c => c.listID === listID).length
+        })
       };
     }
 
     case CREATE_LIST: {
+      const id = (cardID++).toString();
+      action.payload.id = id;
+
       return {
         ...state,
-        items: state.items.update(action.payload.id, {
+        items: state.items.update(id, {
           ...action.payload,
-          position: Number(action.payload.id)
+          position: state.items.all().length
         })
       };
     }

@@ -7,6 +7,7 @@ import { Draggable } from "react-beautiful-dnd";
 
 export interface LocalProps {
   id: string;
+  position: number;
 }
 
 export interface StateProps {
@@ -19,12 +20,17 @@ export interface DispatchProps {
 
 export type Props = LocalProps & StateProps & DispatchProps;
 
-export const ListItem: React.FC<Props> = ({ id, name }) => {
+export const ListItem: React.FC<Props> = ({ id, name, position }) => {
   const handleOnClick = (event: React.MouseEvent<HTMLLIElement>) => {
     window.alert(id);
   };
   return (
-    <Draggable draggableId={`list-item-${id}`} index={Number(0)}>
+    <Draggable
+      key={id}
+      draggableId={`list-item-${id}`}
+      index={position}
+      type="list-item"
+    >
       {provided => (
         <li
           className={"list-item"}

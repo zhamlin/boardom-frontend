@@ -24,8 +24,10 @@ export const getAllListCardsInstance = () =>
   createSelector(
     [selectCards, selectItemID],
     (cards, id) => {
-      const data = cards.all().filter(c => c.listID === id);
-      return cards.fromArray(data);
+      return cards
+        .all()
+        .filter(c => c.listID === id)
+        .sort((a, b) => a.position - b.position);
     }
   );
 
@@ -41,7 +43,7 @@ export const getAllListsInstance = () =>
   createSelector(
     [selectLists],
     (lists: Lists) => {
-      return lists.order((a, b) => (a.position || 0) - (b.position || 0));
+      return lists.all().sort((a, b) => a.position - b.position);
     }
   );
 

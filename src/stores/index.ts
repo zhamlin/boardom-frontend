@@ -6,32 +6,21 @@ interface IDAble {
   id: string;
 }
 
-export class Indexable<T extends IDAble> {
-  public readonly items: Record<number, string>;
-
-  constructor(items: Record<number, string> = {}) {
-    this.items = items;
-  }
-
-  public swap(to: number, from: number): void {}
-  public set(id: string, position: number): Indexable<T> {
-    return new Indexable<T>(this.items);
-  }
-}
-
 export class RecordItem<T extends IDAble> {
-  private readonly data: Readonly<Record<string, T>>;
+  public readonly data: Readonly<Record<string, T>>;
 
   constructor(data: Record<string, T> = {}) {
     this.data = data;
   }
 
-  public order(fn: (a: T, b: T) => number): T[] {
-    return this.all().sort(fn);
-  }
-
-  public fromArray(a: T[]): RecordItem<T> {
-    const map = a.reduce((m, obj) => {
+  public fromArray(
+    a: T[],
+    transformer?: (o: T, index: number) => T
+  ): RecordItem<T> {
+    const map = a.reduce((m, obj, index) => {
+      if (transformer !== undefined) {
+        obj = transformer(obj, index);
+      }
       m[obj.id] = obj;
       return m;
     }, {});
@@ -46,16 +35,37 @@ export class RecordItem<T extends IDAble> {
     return this.data[id];
   };
 
-  public update = (id: string, obj: Partial<T>): RecordItem<T> => {
+  public updateAll = (objs: T[]): RecordItem<T> => {
+    return new RecordItem<T>({
+      ...this.data
+    });
+  };
+
+  public update(id: string, obj: Partial<T>): RecordItem<T> {
     return new RecordItem<T>({
       ...this.data,
       [id]: { ...this.data[id], ...obj }
     });
-  };
+  }
 
   public hasID = (id: string): boolean => {
     return id in this.data;
   };
+}
+
+export interface Positionable {
+  getPosition: () => number;
+  setPosition: (p: number) => void;
+}
+
+export function orderRecords<T extends IDAble, K extends keyof T>(
+  data: T[],
+  key: K
+): RecordItem<T> {
+  return new RecordItem<T>().fromArray(data, (obj: T, index) => {
+    obj[key as string] = index;
+    return obj;
+  });
 }
 
 export interface State {

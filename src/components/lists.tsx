@@ -9,7 +9,7 @@ import { LocalProps as ListProps } from "../components/list";
 import List from "../components/list";
 
 import { connect } from "react-redux";
-import { createList, moveList } from "../constants/actions";
+import { createList, moveCard, moveList } from "../constants/actions";
 import { State } from "../stores";
 import { getAllListsInstance } from "../stores/lists/selectors";
 
@@ -21,6 +21,11 @@ export interface StateProps {
 export interface DispatchProps {
   addList: (name: string) => void;
   listMove: (currentPosition: number, newPosition: number) => void;
+  moveCard: (
+    id: string,
+    source: { listID: string; index: number },
+    destination: { listID: string; index: number }
+  ) => void;
 }
 
 export type Props = StateProps & DispatchProps;
@@ -29,16 +34,39 @@ export const Lists: React.FC<Props> = ({
   lists,
   defaultListName,
   addList,
+  moveCard,
   listMove
 }) => {
   const onAddList = () => {
     addList(defaultListName);
   };
   const handleListDrag = (result: DropResult, provided: ResponderProvided) => {
-    if (result.destination === undefined) {
+    console.log(result);
+    if (result.destination === undefined || result.destination === null) {
       return;
     }
-    listMove(result.source.index, result.destination!.index);
+
+    switch (result.type) {
+      case "lists":
+        listMove(result.source.index, result.destination.index);
+        break;
+      case "list-item":
+        const sourceListID = result.source.droppableId.replace(/[^0-9]/g, "");
+        const destListID = result.destination.droppableId.replace(
+          /[^0-9]/g,
+          ""
+        );
+
+        moveCard(
+          result.draggableId.replace(/[^0-9]/g, ""),
+          { listID: sourceListID, index: result.source.index },
+          { listID: destListID, index: result.destination.index }
+        );
+        break;
+
+      default:
+        break;
+    }
   };
   return (
     <DragDropContext onDragEnd={handleListDrag}>
@@ -77,12 +105,19 @@ const makeMapState = () => {
   };
 };
 
-let nextListID = 0;
+function call<TS extends any[], R>(fn: (...args: TS) => R, ...args: TS): R {
+  return fn(...args);
+}
+
 const mapDispatchToProps: DispatchProps = {
-  addList: (name: string) =>
-    createList({ id: (nextListID++).toString(), name }),
+  addList: (name: string) => createList({ id: "", name }),
   listMove: (currentPosition: number, newPosition: number) =>
-    moveList({ currentPosition, newPosition })
+    moveList({ currentPosition, newPosition }),
+  moveCard: (
+    id: string,
+    source: { listID: string; index: number },
+    destination: { listID: string; index: number }
+  ) => moveCard({ id, source, destination })
 };
 
 export default connect(

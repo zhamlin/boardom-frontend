@@ -1,4 +1,4 @@
-import { Indexable } from "./index";
+// import { Orderable } from "./index";
 
 export interface Item {
   id: string;
@@ -6,9 +6,9 @@ export interface Item {
 }
 
 it("does nothing", () => {
-  const item_index = new Indexable<Item>({
-    "1": 0,
-    "2": 1,
-    "3": 2
-  });
+  // const itemIndex = new Orderable<Item>({
+  //   "1": 0,
+  //   "2": 1,
+  //   "3": 2
+  // });
 });

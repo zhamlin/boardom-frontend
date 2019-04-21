@@ -2,6 +2,7 @@ import { createAction } from "../actions";
 import {
   CREATE_CARD,
   CREATE_LIST,
+  MOVE_CARD,
   MOVE_LIST,
   UPDATE_LIST_NAME
 } from "../constants";
@@ -43,4 +44,19 @@ export interface MoveList {
 }
 export const moveList = createAction<MoveList>(MOVE_LIST);
 
-export type Actions = CreateList | UpdateListName | CreateCard | MoveList;
+export interface MoveCard {
+  type: MOVE_CARD;
+  payload: {
+    id: string;
+    destination: { listID: string; index: number };
+    source: { listID: string; index: number };
+  };
+}
+export const moveCard = createAction<MoveCard>(MOVE_CARD);
+
+export type Actions =
+  | CreateList
+  | UpdateListName
+  | CreateCard
+  | MoveList
+  | MoveCard;
