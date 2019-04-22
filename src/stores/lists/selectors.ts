@@ -20,7 +20,10 @@ export const selectBoard = createSelector(
 export const selectBoardLists = createSelector(
   [selectLists, selectItemID],
   (lists, id) => {
-    return lists.all().filter(l => l.boardID === id);
+    return lists
+      .all()
+      .filter(l => l.boardID === id)
+      .sort((a, b) => a.position - b.position);
   }
 );
 

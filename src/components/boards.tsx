@@ -36,6 +36,7 @@ export const Boards: React.FC<Props & RouteComponentProps> = ({
               </article>
             );
           })}
+          <a className="button">New Board</a>
         </div>
       </div>
     </>
