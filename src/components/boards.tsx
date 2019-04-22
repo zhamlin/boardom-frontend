@@ -7,7 +7,9 @@ import { connect } from "react-redux";
 import { State } from "../stores";
 import { selectBoards } from "../stores/lists/selectors";
 
-export interface LocalProps {}
+export interface LocalProps {
+  path: string;
+}
 
 export interface StateProps {
   boards: BoardProps[];
@@ -17,10 +19,7 @@ export interface DispatchProps {}
 
 export type Props = LocalProps & StateProps & DispatchProps;
 
-export const Boards: React.FC<Props & RouteComponentProps> = ({
-  boards,
-  match
-}) => {
+export const Boards: React.FC<Props> = ({ boards, path }) => {
   return (
     <>
       <h2 className="is-size-6 has-text-white">Select or create a board</h2>
@@ -30,7 +29,7 @@ export const Boards: React.FC<Props & RouteComponentProps> = ({
           {boards.map(b => {
             return (
               <article key={b.id} className="tile is-child notification is-2">
-                <Link to={`${match.path}/${b.id}`} className="title">
+                <Link to={`${path}/${b.id}`} className="title">
                   {b.id}
                 </Link>
               </article>

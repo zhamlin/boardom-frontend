@@ -5,6 +5,7 @@ import { MemoizedPropsState } from "./types";
 
 import { connect } from "react-redux";
 import { State } from "../stores";
+import { getBoardNameInstance } from "../stores/lists/selectors";
 
 export interface LocalProps {
   id: string;
@@ -18,23 +19,20 @@ export interface DispatchProps {}
 
 export type Props = LocalProps & StateProps & DispatchProps;
 
-export const Board: React.FC<Props & RouteComponentProps<LocalProps>> = ({
-  id,
-  name,
-  match
-}) => {
+export const Board: React.FC<Props> = ({ id, name }) => {
   return (
     <>
       <nav className="navbar board">{name}</nav>
-      <Lists boardID={match.params.id} />
+      <Lists boardID={id} />
     </>
   );
 };
 
 const makeMapState: MemoizedPropsState<State, LocalProps, StateProps> = () => {
+  const getBoardName = getBoardNameInstance();
   return (state, props) => {
     return {
-      name: "test"
+      name: getBoardName(state, props.id)
     };
   };
 };
