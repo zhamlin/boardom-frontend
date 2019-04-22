@@ -1,6 +1,6 @@
 import * as React from "react";
 import { Link, Route, RouteComponentProps } from "react-router-dom";
-import { Board, LocalProps as BoardProps } from "./board";
+import { Board, Props as BoardProps } from "./board";
 import { MemoizedPropsState } from "./types";
 
 import { connect } from "react-redux";
@@ -30,7 +30,7 @@ export const Boards: React.FC<Props> = ({ boards, path }) => {
             return (
               <article key={b.id} className="tile is-child notification is-2">
                 <Link to={`${path}/${b.id}`} className="title">
-                  {b.id}
+                  {b.name}
                 </Link>
               </article>
             );
