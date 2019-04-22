@@ -1,7 +1,8 @@
+import * as React from "react";
+import { MemoizedPropsState } from "./types";
+
 import { connect } from "react-redux";
 import { State } from "../stores";
-
-import * as React from "react";
 
 export interface LocalProps {}
 
@@ -19,8 +20,8 @@ export const COMPONENT: React.FC<Props> = () => {
   );
 };
 
-const makeMapState = () => {
-  return (state: State, props: LocalProps): StateProps => {
+const makeMapState: MemoizedPropsState<State, LocalProps, StateProps>  = () => {
+  return (state, props) => {
     return {};
   };
 };

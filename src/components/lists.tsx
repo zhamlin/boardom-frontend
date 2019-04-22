@@ -7,11 +7,16 @@ import {
 } from "react-beautiful-dnd";
 import { LocalProps as ListProps } from "../components/list";
 import List from "../components/list";
+import { MemoizedPropsState } from "./types";
 
 import { connect } from "react-redux";
 import { createList, moveCard, moveList } from "../constants/actions";
 import { State } from "../stores";
-import { getAllListsInstance } from "../stores/lists/selectors";
+import { selectBoardLists } from "../stores/lists/selectors";
+
+export interface LocalProps {
+  boardID: string;
+}
 
 export interface StateProps {
   lists: ListProps[];
@@ -19,7 +24,7 @@ export interface StateProps {
 }
 
 export interface DispatchProps {
-  addList: (name: string) => void;
+  addList: (name: string, boardID: string) => void;
   listMove: (currentPosition: number, newPosition: number) => void;
   moveCard: (
     id: string,
@@ -28,20 +33,20 @@ export interface DispatchProps {
   ) => void;
 }
 
-export type Props = StateProps & DispatchProps;
+export type Props = LocalProps & StateProps & DispatchProps;
 
 export const Lists: React.FC<Props> = ({
   lists,
   defaultListName,
   addList,
   moveCard,
-  listMove
+  listMove,
+  boardID
 }) => {
   const onAddList = () => {
-    addList(defaultListName);
+    addList(defaultListName, boardID);
   };
   const handleListDrag = (result: DropResult, provided: ResponderProvided) => {
-    console.log(result);
     if (result.destination === undefined || result.destination === null) {
       return;
     }
@@ -95,22 +100,17 @@ export const Lists: React.FC<Props> = ({
   );
 };
 
-const makeMapState = () => {
-  const getAllLists = getAllListsInstance();
-  return (state: State): StateProps => {
+const makeMapState: MemoizedPropsState<State, LocalProps, StateProps> = () => {
+  return (state, props) => {
     return {
       defaultListName: "list",
-      lists: getAllLists(state)
+      lists: selectBoardLists(state, props.boardID)
     };
   };
 };
 
-function call<TS extends any[], R>(fn: (...args: TS) => R, ...args: TS): R {
-  return fn(...args);
-}
-
 const mapDispatchToProps: DispatchProps = {
-  addList: (name: string) => createList({ id: "", name }),
+  addList: (name: string, boardID: string) => createList({ boardID, name }),
   listMove: (currentPosition: number, newPosition: number) =>
     moveList({ currentPosition, newPosition }),
   moveCard: (

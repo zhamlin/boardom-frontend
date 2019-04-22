@@ -1,9 +1,10 @@
+import * as React from "react";
+import { Draggable } from "react-beautiful-dnd";
+import { MemoizedPropsState } from "./types";
+
 import { connect } from "react-redux";
 import { State } from "../stores";
 import { getCardNameInstance } from "../stores/lists/selectors";
-
-import * as React from "react";
-import { Draggable } from "react-beautiful-dnd";
 
 export interface LocalProps {
   id: string;
@@ -46,10 +47,7 @@ export const ListItem: React.FC<Props> = ({ id, name, position }) => {
   );
 };
 
-type MemorizedState<S, SP> = () => (state: S) => SP;
-type MemorizedPropsState<S, P, SP> = () => (state: S, props: P) => SP;
-
-const makeMapState: MemorizedPropsState<State, LocalProps, StateProps> = () => {
+const makeMapState: MemoizedPropsState<State, LocalProps, StateProps> = () => {
   const getCardName = getCardNameInstance();
   return (state, props) => {
     return {

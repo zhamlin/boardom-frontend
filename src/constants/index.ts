@@ -12,3 +12,6 @@ export type CREATE_CARD = typeof CREATE_CARD;
 
 export const MOVE_CARD = "MOVE_CARD";
 export type MOVE_CARD = typeof MOVE_CARD;
+
+export const CREATE_BOARD = "CREATE_BOARD";
+export type CREATE_BOARD = typeof CREATE_BOARD;

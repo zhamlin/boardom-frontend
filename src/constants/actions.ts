@@ -1,5 +1,6 @@
 import { createAction } from "../actions";
 import {
+  CREATE_BOARD,
   CREATE_CARD,
   CREATE_LIST,
   MOVE_CARD,
@@ -11,7 +12,8 @@ export interface CreateList {
   type: CREATE_LIST;
   payload: {
     name: string;
-    id: string;
+    boardID: string;
+    id?: string;
   };
 }
 export const createList = createAction<CreateList>(CREATE_LIST);
@@ -54,9 +56,19 @@ export interface MoveCard {
 }
 export const moveCard = createAction<MoveCard>(MOVE_CARD);
 
+export interface CreateBoard {
+  type: CREATE_BOARD;
+  payload: {
+    name: string;
+    id: string;
+  };
+}
+export const createBoard = createAction<CreateBoard>(CREATE_BOARD);
+
 export type Actions =
   | CreateList
-  | UpdateListName
   | CreateCard
+  | CreateBoard
+  | UpdateListName
   | MoveList
   | MoveCard;

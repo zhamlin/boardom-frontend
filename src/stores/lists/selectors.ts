@@ -1,10 +1,36 @@
 import { createSelector, ParametricSelector, Selector } from "reselect";
 import { State } from "../index";
-import { ListItems, Lists } from "./reducer";
+import { Boards, ListItems, Lists } from "./reducer";
 
-const selectLists: Selector<State, Lists> = state => state.lists.items;
-const selectCards: Selector<State, ListItems> = state => state.lists.cards;
-const selectItemID: ParametricSelector<State, any, string> = (_, id) => id;
+export const selectLists: Selector<State, Lists> = state => state.lists.items;
+export const selectBoards: Selector<State, Boards> = state =>
+  state.lists.boards;
+export const selectCards: Selector<State, ListItems> = state =>
+  state.lists.cards;
+export const selectItemID: ParametricSelector<State, any, string> = (_, id) =>
+  id;
+
+export const selectBoard = createSelector(
+  [selectBoards, selectItemID],
+  (boards, id) => {
+    return boards.get(id)!;
+  }
+);
+
+export const selectBoardLists = createSelector(
+  [selectLists, selectItemID],
+  (lists, id) => {
+    return lists.all().filter(l => l.boardID === id);
+  }
+);
+
+export const getBoardNameInstance = () =>
+  createSelector(
+    [selectBoard],
+    board => {
+      return board.name;
+    }
+  );
 
 const selectList = createSelector(
   [selectLists, selectItemID],

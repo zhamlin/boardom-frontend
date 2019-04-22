@@ -1,9 +1,3 @@
-import { Draggable } from "react-beautiful-dnd";
-import { Droppable } from "react-beautiful-dnd";
-import { connect } from "react-redux";
-import { createCard, moveCard, updateListName } from "../constants/actions";
-import { State } from "../stores";
-
 import * as React from "react";
 import {
   getAllListCardsInstance,
@@ -11,6 +5,12 @@ import {
 } from "../stores/lists/selectors";
 import { LocalProps as ListItemProps } from "./list_items";
 import ListItem from "./list_items";
+import { MemoizedPropsState } from "./types";
+
+import { Draggable, Droppable } from "react-beautiful-dnd";
+import { connect } from "react-redux";
+import { createCard, updateListName } from "../constants/actions";
+import { State } from "../stores";
 
 export interface LocalProps {
   id: string;
@@ -51,7 +51,7 @@ const ListName: React.FC<Pick<Props, "id" | "name" | "onListNameChange">> = ({
         </h3>
       )}
       {editingName && (
-        <div className="control ">
+        <div className="">
           <input
             onBlur={onBlur}
             autoFocus={true}
@@ -124,10 +124,10 @@ export const List: React.FC<Props> = ({
   );
 };
 
-const makeMapState = () => {
+const makeMapState: MemoizedPropsState<State, LocalProps, StateProps> = () => {
   const getListName = getListNameInstance();
   const getAllListCards = getAllListCardsInstance();
-  return (state: State, props: LocalProps): StateProps => {
+  return (state, props) => {
     return {
       items: getAllListCards(state, props.id),
       name: getListName(state, props.id)

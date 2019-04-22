@@ -1,4 +1,5 @@
 import {
+  CREATE_BOARD,
   CREATE_CARD,
   CREATE_LIST,
   MOVE_CARD,
@@ -8,42 +9,43 @@ import {
 import { Actions } from "../../constants/actions";
 import { orderRecords, RecordItem } from "../index";
 
-export class ListItem {
-  public id: string;
-  public listID: string;
-  public name: string;
-  public position: number;
-
-  public getPosition = (): number => this.position;
-  public setPosition = (p: number): void => {
-    this.position = p;
-  };
+export interface ListItem {
+  id: string;
+  listID: string;
+  name: string;
+  position: number;
+  boardID: string;
 }
 export type ListItems = RecordItem<ListItem>;
+
+export interface Board {
+  id: string;
+  name: string;
+}
+export type Boards = RecordItem<Board>;
 
 export interface List {
   id: string;
   name: string;
   position: number;
+  boardID: string;
 }
 export type Lists = RecordItem<List>;
 
 export interface State {
   items: Lists;
   cards: ListItems;
-}
-
-export interface Positionable {
-  getPosition: () => number;
-  setPosition: (p: number) => void;
+  boards: Boards;
 }
 
 let cardID = 0;
-const listID = 0;
+let listID = 0;
+let boardID = 0;
 export default function reducer(
   state: Readonly<State> = {
     cards: new RecordItem<ListItem>(),
-    items: new RecordItem<List>()
+    items: new RecordItem<List>(),
+    boards: new RecordItem<Board>()
   },
   action: Actions
 ): State {
@@ -121,8 +123,20 @@ export default function reducer(
       };
     }
 
+    case CREATE_BOARD: {
+      const id = (boardID++).toString();
+      action.payload.id = id;
+
+      return {
+        ...state,
+        boards: state.boards.update(id, {
+          ...action.payload
+        })
+      };
+    }
+
     case CREATE_LIST: {
-      const id = (cardID++).toString();
+      const id = (listID++).toString();
       action.payload.id = id;
 
       return {
