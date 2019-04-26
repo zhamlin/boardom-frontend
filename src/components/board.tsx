@@ -16,18 +16,18 @@ export interface StateProps {
 }
 
 export interface DispatchProps {
-  updateBoardName: (name: string, id: string) => void;
+  updateBoardNameAction: (name: string, id: string) => void;
 }
 
 export type Props = LocalProps & StateProps & DispatchProps;
 
-export const Board: React.FC<Props> = ({ id, name, updateBoardName }) => {
+export const Board: React.FC<Props> = ({ id, name, updateBoardNameAction }) => {
   const [editingName, setEditingHidden] = React.useState<boolean>(false);
   const handleClick = () => setEditingHidden(!editingName);
   const handleFocus = (event: React.FocusEvent<HTMLInputElement>) =>
     event.target.select();
   const handleBlur = (event: React.FocusEvent<HTMLInputElement>) => {
-    updateBoardName(event.target.value, id);
+    updateBoardNameAction(event.target.value, id);
     setEditingHidden(false);
   };
 
@@ -36,8 +36,8 @@ export const Board: React.FC<Props> = ({ id, name, updateBoardName }) => {
     setNewName(event.currentTarget.value);
   }
   function handleKeyDown(event: React.KeyboardEvent<HTMLInputElement>) {
-    if (event.key == "Enter") {
-      updateBoardName(event.currentTarget.value, id);
+    if (event.key === "Enter") {
+      updateBoardNameAction(event.currentTarget.value, id);
       setEditingHidden(false);
     }
   }
@@ -77,7 +77,8 @@ const makeMapState: MemoizedPropsState<State, LocalProps, StateProps> = () => {
 };
 
 const mapDispatchToProps: DispatchProps = {
-  updateBoardName: (name: string, id: string) => updateBoardName({ id, name })
+  updateBoardNameAction: (name: string, id: string) =>
+    updateBoardName({ id, name })
 };
 
 export default connect(

@@ -22,14 +22,18 @@ export interface StateProps {
 }
 
 export interface DispatchProps {
-  createBoard: (name: string) => void;
+  createBoardAction: (name: string) => void;
 }
 
 export type Props = LocalProps & StateProps & DispatchProps;
 
-export const Boards: React.FC<Props> = ({ boards, path, createBoard }) => {
+export const Boards: React.FC<Props> = ({
+  boards,
+  path,
+  createBoardAction
+}) => {
   function handleNewBoard() {
-    createBoard("default");
+    createBoardAction("default");
   }
   return (
     <>
@@ -64,7 +68,7 @@ const makeMapState: MemoizedPropsState<State, LocalProps, StateProps> = () => {
 };
 
 const mapDispatchToProps: DispatchProps = {
-  createBoard: (name: string) => createBoard({ name })
+  createBoardAction: (name: string) => createBoard({ name })
 };
 
 export default connect(

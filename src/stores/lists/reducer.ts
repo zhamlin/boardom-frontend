@@ -40,13 +40,13 @@ export interface State {
 }
 
 let cardID = 0;
-let listID = 0;
+let currentListID = 0;
 let boardID = 0;
 export default function reducer(
   state: Readonly<State> = {
+    boards: new RecordItem<Board>(),
     cards: new RecordItem<ListItem>(),
-    items: new RecordItem<List>(),
-    boards: new RecordItem<Board>()
+    items: new RecordItem<List>()
   },
   action: Actions
 ): State {
@@ -145,7 +145,7 @@ export default function reducer(
     }
 
     case CREATE_LIST: {
-      const id = (listID++).toString();
+      const id = (currentListID++).toString();
       action.payload.id = id;
 
       return {

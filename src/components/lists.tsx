@@ -26,7 +26,7 @@ export interface StateProps {
 export interface DispatchProps {
   addList: (name: string, boardID: string) => void;
   listMove: (currentPosition: number, newPosition: number) => void;
-  moveCard: (
+  moveCardAction: (
     id: string,
     source: { listID: string; index: number },
     destination: { listID: string; index: number }
@@ -39,7 +39,7 @@ export const Lists: React.FC<Props> = ({
   lists,
   defaultListName,
   addList,
-  moveCard,
+  moveCardAction,
   listMove,
   boardID
 }) => {
@@ -62,7 +62,7 @@ export const Lists: React.FC<Props> = ({
           ""
         );
 
-        moveCard(
+        moveCardAction(
           result.draggableId.replace(/[^0-9]/g, ""),
           { listID: sourceListID, index: result.source.index },
           { listID: destListID, index: result.destination.index }
@@ -113,7 +113,7 @@ const mapDispatchToProps: DispatchProps = {
   addList: (name: string, boardID: string) => createList({ boardID, name }),
   listMove: (currentPosition: number, newPosition: number) =>
     moveList({ currentPosition, newPosition }),
-  moveCard: (
+  moveCardAction: (
     id: string,
     source: { listID: string; index: number },
     destination: { listID: string; index: number }
