@@ -23,24 +23,36 @@ export type Props = LocalProps & StateProps & DispatchProps;
 
 export const Board: React.FC<Props> = ({ id, name, updateBoardNameAction }) => {
   const [editingName, setEditingHidden] = React.useState<boolean>(false);
+  const [newName, setNewName] = React.useState<string>(name);
+
   const handleClick = () => setEditingHidden(!editingName);
   const handleFocus = (event: React.FocusEvent<HTMLInputElement>) =>
     event.target.select();
+
   const handleBlur = (event: React.FocusEvent<HTMLInputElement>) => {
+    if (event.target.value === "") {
+      setNewName(name);
+      setEditingHidden(false);
+      return;
+    }
     updateBoardNameAction(event.target.value, id);
     setEditingHidden(false);
   };
 
-  const [newName, setNewName] = React.useState<string>(name);
-  function handleInputChange(event: React.FormEvent<HTMLInputElement>) {
+  const handleInputChange = (event: React.FormEvent<HTMLInputElement>) => {
     setNewName(event.currentTarget.value);
-  }
-  function handleKeyDown(event: React.KeyboardEvent<HTMLInputElement>) {
-    if (event.key === "Enter") {
+  };
+
+  const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
+    if (event.currentTarget.value === "" && event.key === "Enter") {
+      setNewName(name);
+      setEditingHidden(false);
+      return;
+    } else if (event.key === "Enter" && event.currentTarget.value !== "") {
       updateBoardNameAction(event.currentTarget.value, id);
       setEditingHidden(false);
     }
-  }
+  };
   return (
     <>
       <nav className="navbar is-dark">
