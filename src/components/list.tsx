@@ -1,4 +1,5 @@
 import * as React from "react";
+import { Draggable, Droppable } from "react-beautiful-dnd";
 import {
   getAllListCardsInstance,
   getListNameInstance
@@ -7,10 +8,9 @@ import { LocalProps as ListItemProps } from "./list_items";
 import ListItem from "./list_items";
 import { MemoizedPropsState } from "./types";
 
-import { Draggable, Droppable } from "react-beautiful-dnd";
 import { connect } from "react-redux";
-import { createCard, updateListName } from "../constants/actions";
 import { State } from "../stores";
+import { createCard, updateListName } from "../stores/lists/actions";
 
 export interface LocalProps {
   id: string;

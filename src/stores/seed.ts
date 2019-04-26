@@ -1,4 +1,4 @@
-import * as actions from "../constants/actions";
+import * as actions from "./lists/actions";
 
 export function cards(store: any) {
   const boards = [{ name: "main board", id: "0" }];

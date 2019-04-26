@@ -1,6 +1,6 @@
 import * as React from "react";
-import { Link, Route, RouteComponentProps } from "react-router-dom";
-import { Board, Props as BoardProps } from "./board";
+import { Link } from "react-router-dom";
+import { Props as BoardProps } from "./board";
 import { MemoizedPropsState } from "./types";
 
 import { connect } from "react-redux";

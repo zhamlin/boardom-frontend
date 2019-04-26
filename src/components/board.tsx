@@ -1,5 +1,4 @@
 import * as React from "react";
-import { RouteComponentProps } from "react-router-dom";
 import Lists from "./lists";
 import { MemoizedPropsState } from "./types";
 

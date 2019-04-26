@@ -10,8 +10,8 @@ import List from "../components/list";
 import { MemoizedPropsState } from "./types";
 
 import { connect } from "react-redux";
-import { createList, moveCard, moveList } from "../constants/actions";
 import { State } from "../stores";
+import { createList, moveCard, moveList } from "../stores/lists/actions";
 import { selectBoardLists } from "../stores/lists/selectors";
 
 export interface LocalProps {

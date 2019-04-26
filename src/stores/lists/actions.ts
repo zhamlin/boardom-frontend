@@ -1,4 +1,4 @@
-import { createAction } from "../actions";
+import { createAction } from "../../actions";
 import {
   CREATE_BOARD,
   CREATE_CARD,
@@ -6,10 +6,10 @@ import {
   MOVE_CARD,
   MOVE_LIST,
   UPDATE_LIST_NAME
-} from "../constants";
+} from "../../constants/lists";
 
 export interface CreateList {
-  type: CREATE_LIST;
+  type: typeof CREATE_LIST;
   payload: {
     name: string;
     boardID: string;
@@ -19,7 +19,7 @@ export interface CreateList {
 export const createList = createAction<CreateList>(CREATE_LIST);
 
 export interface UpdateListName {
-  type: UPDATE_LIST_NAME;
+  type: typeof UPDATE_LIST_NAME;
   payload: {
     name: string;
     id: string;
@@ -28,7 +28,7 @@ export interface UpdateListName {
 export const updateListName = createAction<UpdateListName>(UPDATE_LIST_NAME);
 
 export interface CreateCard {
-  type: CREATE_CARD;
+  type: typeof CREATE_CARD;
   payload: {
     name: string;
     id: string;
@@ -38,7 +38,7 @@ export interface CreateCard {
 export const createCard = createAction<CreateCard>(CREATE_CARD);
 
 export interface MoveList {
-  type: MOVE_LIST;
+  type: typeof MOVE_LIST;
   payload: {
     currentPosition: number;
     newPosition: number;
@@ -47,7 +47,7 @@ export interface MoveList {
 export const moveList = createAction<MoveList>(MOVE_LIST);
 
 export interface MoveCard {
-  type: MOVE_CARD;
+  type: typeof MOVE_CARD;
   payload: {
     id: string;
     destination: { listID: string; index: number };
@@ -57,7 +57,7 @@ export interface MoveCard {
 export const moveCard = createAction<MoveCard>(MOVE_CARD);
 
 export interface CreateBoard {
-  type: CREATE_BOARD;
+  type: typeof CREATE_BOARD;
   payload: {
     name: string;
     id: string;

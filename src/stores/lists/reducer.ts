@@ -5,9 +5,9 @@ import {
   MOVE_CARD,
   MOVE_LIST,
   UPDATE_LIST_NAME
-} from "../../constants";
-import { Actions } from "../../constants/actions";
+} from "../../constants/lists";
 import { orderRecords, RecordItem } from "../index";
+import { Actions } from "./actions";
 
 export interface ListItem {
   id: string;

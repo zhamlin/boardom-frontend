@@ -10,7 +10,12 @@ import {
   RouteComponentProps
 } from "react-router-dom";
 import Board from "./components/board";
+import { LocalProps as BoardProps } from "./components/board";
+import { LocalProps as BoardsProps } from "./components/board";
 import Boards from "./components/boards";
+
+import { store } from "./index";
+import { selectBoard } from "./stores/lists/selectors";
 
 function Home() {
   return (
@@ -20,11 +25,24 @@ function Home() {
   );
 }
 
-function BoardRoute({ match }: any) {
-  return <Board id={match.params.id as string} />;
+function NotFound({ location }: RouteComponentProps) {
+  return (
+    <div>
+      <h3>
+        No match for <code>{location.pathname}</code>
+      </h3>
+    </div>
+  );
 }
 
-function BoardsRoute({ match }: any) {
+function BoardRoute({ match }: RouteComponentProps<BoardProps>) {
+  if (selectBoard(store.getState(), match.params.id) == null) {
+    return null;
+  }
+  return <Board id={match.params.id} />;
+}
+
+function BoardsRoute({ match }: RouteComponentProps<BoardsProps>) {
   return <Boards path={match.path} />;
 }
 
@@ -40,9 +58,11 @@ class App extends React.Component {
             Boards
           </Link>
         </nav>
+
         <Route exact={true} path="/" component={Home} />
         <Route exact={true} path="/boards" component={BoardsRoute} />
         <Route exact={true} path="/boards/:id" component={BoardRoute} />
+        <Route component={NotFound} />
       </Router>
     );
   }
