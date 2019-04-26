@@ -5,6 +5,7 @@ import { MemoizedPropsState } from "./types";
 
 import { connect } from "react-redux";
 import { State } from "../stores";
+import { createBoard } from "../stores/lists/actions";
 import { selectBoards } from "../stores/lists/selectors";
 
 export interface LocalProps {
@@ -15,11 +16,16 @@ export interface StateProps {
   boards: BoardProps[];
 }
 
-export interface DispatchProps {}
+export interface DispatchProps {
+  createBoard: (name: string) => void;
+}
 
 export type Props = LocalProps & StateProps & DispatchProps;
 
-export const Boards: React.FC<Props> = ({ boards, path }) => {
+export const Boards: React.FC<Props> = ({ boards, path, createBoard }) => {
+  function handleNewBoard() {
+    createBoard("default");
+  }
   return (
     <>
       <h2 className="is-size-6 has-text-white">Select or create a board</h2>
@@ -35,7 +41,9 @@ export const Boards: React.FC<Props> = ({ boards, path }) => {
               </article>
             );
           })}
-          <a className="button">New Board</a>
+          <a onClick={handleNewBoard} className="button">
+            New Board
+          </a>
         </div>
       </div>
     </>
@@ -50,7 +58,9 @@ const makeMapState: MemoizedPropsState<State, LocalProps, StateProps> = () => {
   };
 };
 
-const mapDispatchToProps: DispatchProps = {};
+const mapDispatchToProps: DispatchProps = {
+  createBoard: (name: string) => createBoard({ name })
+};
 
 export default connect(
   makeMapState,

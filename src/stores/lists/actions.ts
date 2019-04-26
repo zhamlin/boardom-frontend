@@ -60,7 +60,7 @@ export interface CreateBoard {
   type: typeof CREATE_BOARD;
   payload: {
     name: string;
-    id: string;
+    id?: string;
   };
 }
 export const createBoard = createAction<CreateBoard>(CREATE_BOARD);
