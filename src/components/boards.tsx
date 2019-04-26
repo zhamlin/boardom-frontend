@@ -1,6 +1,9 @@
 import * as React from "react";
 import { Link } from "react-router-dom";
-import { Props as BoardProps } from "./board";
+import {
+  LocalProps as LocalBoardProps,
+  StateProps as StateBoardProps
+} from "./board";
 import { MemoizedPropsState } from "./types";
 
 import { connect } from "react-redux";
@@ -11,6 +14,8 @@ import { selectBoards } from "../stores/lists/selectors";
 export interface LocalProps {
   path: string;
 }
+
+type BoardProps = LocalBoardProps & StateBoardProps;
 
 export interface StateProps {
   boards: BoardProps[];

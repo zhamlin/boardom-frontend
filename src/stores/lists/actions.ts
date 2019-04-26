@@ -5,6 +5,7 @@ import {
   CREATE_LIST,
   MOVE_CARD,
   MOVE_LIST,
+  UPDATE_BOARD_NAME,
   UPDATE_LIST_NAME
 } from "../../constants/lists";
 
@@ -65,10 +66,20 @@ export interface CreateBoard {
 }
 export const createBoard = createAction<CreateBoard>(CREATE_BOARD);
 
+export interface UpdateBoardName {
+  type: typeof UPDATE_BOARD_NAME;
+  payload: {
+    name: string;
+    id: string;
+  };
+}
+export const updateBoardName = createAction<UpdateBoardName>(UPDATE_BOARD_NAME);
+
 export type Actions =
   | CreateList
   | CreateCard
   | CreateBoard
   | UpdateListName
+  | UpdateBoardName
   | MoveList
   | MoveCard;

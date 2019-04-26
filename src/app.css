@@ -105,6 +105,15 @@ body {
   background-color: #eee;
 }
 
+nav.navbar > input.title {
+  margin: 0.8rem;
+}
+
+nav.navbar > h3.title {
+  padding: 0.8rem;
+  cursor: pointer;
+}
+
 .list-button {
   text-decoration: underline;
   padding: 16px;

@@ -4,6 +4,7 @@ import {
   CREATE_LIST,
   MOVE_CARD,
   MOVE_LIST,
+  UPDATE_BOARD_NAME,
   UPDATE_LIST_NAME
 } from "../../constants/lists";
 import { orderRecords, RecordItem } from "../index";
@@ -110,6 +111,14 @@ export default function reducer(
         items: state.items.update(action.payload.id, action.payload)
       };
     }
+
+    case UPDATE_BOARD_NAME: {
+      return {
+        ...state,
+        boards: state.boards.update(action.payload.id, action.payload)
+      };
+    }
+
     case CREATE_CARD: {
       const id = (cardID++).toString();
       action.payload.id = id;
