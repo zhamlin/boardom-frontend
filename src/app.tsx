@@ -7,7 +7,8 @@ import {
   BrowserRouter as Router,
   Link,
   Route,
-  RouteComponentProps
+  RouteComponentProps,
+  Switch
 } from "react-router-dom";
 import Board from "./components/board";
 import { LocalProps as BoardProps } from "./components/board";
@@ -35,9 +36,9 @@ function NotFound({ location }: RouteComponentProps) {
   );
 }
 
-function BoardRoute({ match }: RouteComponentProps<BoardProps>) {
+function BoardRoute({ match, location }: RouteComponentProps<BoardProps>) {
   if (selectBoard(store.getState(), match.params.id) == null) {
-    return null;
+    return NotFound({ location } as RouteComponentProps);
   }
   return <Board id={match.params.id} />;
 }
@@ -59,10 +60,12 @@ class App extends React.Component {
           </Link>
         </nav>
 
-        <Route exact={true} path="/" component={Home} />
-        <Route exact={true} path="/boards" component={BoardsRoute} />
-        <Route exact={true} path="/boards/:id" component={BoardRoute} />
-        <Route component={NotFound} />
+        <Switch>
+          <Route exact={true} path="/" component={Home} />
+          <Route exact={true} path="/boards" component={BoardsRoute} />
+          <Route exact={true} path="/boards/:id" component={BoardRoute} />
+          <Route component={NotFound} />
+        </Switch>
       </Router>
     );
   }
