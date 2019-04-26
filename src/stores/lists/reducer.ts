@@ -1,3 +1,4 @@
+import { createTransform } from "redux-persist";
 import {
   CREATE_BOARD,
   CREATE_CARD,
@@ -39,9 +40,31 @@ export interface State {
   boards: Boards;
 }
 
+export const PersistTransform = createTransform<State, State>(
+  // transform state on its way to being serialized and persisted.
+  inboundState => {
+    return inboundState;
+  },
+
+  // transform state being rehydrated
+  outboundState => {
+    const { boards, items, cards } = outboundState;
+    return {
+      ...outboundState,
+      boards: new RecordItem<Board>(boards.data),
+      cards: new RecordItem<ListItem>(cards.data),
+      items: new RecordItem<List>(items.data)
+    };
+  },
+
+  // define which reducers this transform gets called for.
+  { whitelist: ["lists"] }
+);
+
 let cardID = 0;
 let currentListID = 0;
 let boardID = 0;
+
 export default function reducer(
   state: Readonly<State> = {
     boards: new RecordItem<Board>(),

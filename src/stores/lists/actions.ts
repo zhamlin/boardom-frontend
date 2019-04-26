@@ -1,6 +1,7 @@
 import { createAction } from "../../actions";
 import {
   CREATE_BOARD,
+  CREATE_BOARD_ROLLBACK,
   CREATE_CARD,
   CREATE_LIST,
   MOVE_CARD,
@@ -65,6 +66,14 @@ export interface CreateBoard {
   };
 }
 export const createBoard = createAction<CreateBoard>(CREATE_BOARD);
+
+export interface CreateBoardRollback {
+  type: typeof CREATE_BOARD_ROLLBACK;
+  payload: Pick<CreateBoard, "payload">;
+}
+export const createBoardRollback = createAction<CreateBoardRollback>(
+  CREATE_BOARD_ROLLBACK
+);
 
 export interface UpdateBoardName {
   type: typeof UPDATE_BOARD_NAME;

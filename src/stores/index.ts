@@ -1,6 +1,14 @@
-import { combineReducers, createStore } from "redux";
-import { State as ListsState } from "./lists/reducer";
+import { applyMiddleware, combineReducers, compose, createStore } from "redux";
+import {
+  PersistTransform as ListsTransform,
+  State as ListsState
+} from "./lists/reducer";
 import lists from "./lists/reducer";
+
+import { createOffline } from "@redux-offline/redux-offline";
+import offlineConfig from "@redux-offline/redux-offline/lib/defaults";
+import { persistReducer, persistStore } from "redux-persist";
+import storage from "redux-persist/es/storage";
 
 interface IDAble {
   id: string;
@@ -53,11 +61,6 @@ export class RecordItem<T extends IDAble> {
   };
 }
 
-export interface Positionable {
-  getPosition: () => number;
-  setPosition: (p: number) => void;
-}
-
 export function orderRecords<T extends IDAble, K extends keyof T>(
   data: T[],
   key: K
@@ -76,11 +79,35 @@ const rootReducer = combineReducers<State>({
   lists
 });
 
+const persistConfig = {
+  key: "root",
+  storage,
+  transforms: [ListsTransform]
+};
+
+const {
+  middleware: offlineMiddleware,
+  enhanceReducer: offlineEnhanceReducer,
+  enhanceStore: offlineEnhanceStore
+} = createOffline({
+  ...offlineConfig,
+  persist: false as any
+});
+
+const persistedReducer = persistReducer(
+  persistConfig,
+  offlineEnhanceReducer(rootReducer)
+);
+
+const composeEnhancers =
+  (window as any).__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
+
 export function makeStore() {
-  return createStore(
-    rootReducer,
-    {},
-    (window as any).__REDUX_DEVTOOLS_EXTENSION__ &&
-      (window as any).__REDUX_DEVTOOLS_EXTENSION__()
+  const store = createStore(
+    persistedReducer,
+    composeEnhancers(offlineEnhanceStore, applyMiddleware(offlineMiddleware))
   );
+
+  const persistor = persistStore(store);
+  return { persistor, store };
 }

@@ -21,6 +21,8 @@ export interface DispatchProps {
 
 export type Props = LocalProps & StateProps & DispatchProps;
 
+const isDoneKey = (key: string) => key === "Enter" || key === "Escape";
+
 export const Board: React.FC<Props> = ({ id, name, updateBoardNameAction }) => {
   const [editingName, setEditingHidden] = React.useState<boolean>(false);
   const [newName, setNewName] = React.useState<string>(name);
@@ -29,14 +31,17 @@ export const Board: React.FC<Props> = ({ id, name, updateBoardNameAction }) => {
   const handleFocus = (event: React.FocusEvent<HTMLInputElement>) =>
     event.target.select();
 
-  const handleBlur = (event: React.FocusEvent<HTMLInputElement>) => {
-    if (event.target.value === "") {
+  const updateValue = (value: string) => {
+    if (value === "") {
       setNewName(name);
-      setEditingHidden(false);
-      return;
+    } else {
+      updateBoardNameAction(value, id);
     }
-    updateBoardNameAction(event.target.value, id);
+  };
+
+  const handleBlur = (event: React.FocusEvent<HTMLInputElement>) => {
     setEditingHidden(false);
+    updateValue(event.currentTarget.value);
   };
 
   const handleInputChange = (event: React.FormEvent<HTMLInputElement>) => {
@@ -44,14 +49,10 @@ export const Board: React.FC<Props> = ({ id, name, updateBoardNameAction }) => {
   };
 
   const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
-    if (event.currentTarget.value === "" && event.key === "Enter") {
-      setNewName(name);
-      setEditingHidden(false);
-      return;
-    } else if (event.key === "Enter" && event.currentTarget.value !== "") {
-      updateBoardNameAction(event.currentTarget.value, id);
+    if (isDoneKey(event.key)) {
       setEditingHidden(false);
     }
+    updateValue(event.currentTarget.value);
   };
   return (
     <>
