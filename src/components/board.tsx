@@ -35,6 +35,12 @@ export const Board: React.FC<Props> = ({ id, name, updateBoardName }) => {
   function handleInputChange(event: React.FormEvent<HTMLInputElement>) {
     setNewName(event.currentTarget.value);
   }
+  function handleKeyDown(event: React.KeyboardEvent<HTMLInputElement>) {
+    if (event.key == "Enter") {
+      updateBoardName(event.currentTarget.value, id);
+      setEditingHidden(false);
+    }
+  }
   return (
     <>
       <nav className="navbar is-dark">
@@ -45,6 +51,7 @@ export const Board: React.FC<Props> = ({ id, name, updateBoardName }) => {
         )}
         {editingName && (
           <input
+            onKeyDown={handleKeyDown}
             onFocus={handleFocus}
             onBlur={handleBlur}
             onChange={handleInputChange}
