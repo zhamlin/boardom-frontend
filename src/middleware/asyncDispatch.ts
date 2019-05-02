@@ -1,13 +1,15 @@
-import { Action, Store, Middleware} from "redux";
+import { Action, Middleware } from "redux";
+import { State } from "stores";
 
 export interface DispatchAction {
   asyncDispatch: (a: Action<any>) => void;
 }
 
 // from https://lazamar.github.io/dispatching-from-inside-of-reducers/
-const asyncDispatchMiddleware: Middleware<{}, any, any> = (store: any) => (next: any) => (
-  action: Action<any>
-) => {
+const asyncDispatchMiddleware: Middleware<
+  (a: Action<any>) => void,
+  State
+> = store => next => (action: Action<any>) => {
   let syncActivityFinished = false;
   let actionQueue: Array<Action<any>> = [];
 

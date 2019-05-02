@@ -14,9 +14,9 @@
  */
 
 import * as url from "url";
-import { Configuration } from "./configuration";
 // import * as portableFetch from "portable-fetch";
 let portableFetch = fetch;
+import { Configuration } from "./configuration";
 
 const BASE_PATH = "http://localhost".replace(/\/+$/, "");
 

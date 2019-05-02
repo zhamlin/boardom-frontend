@@ -3,9 +3,9 @@ import Lists from "./lists";
 import { MemoizedPropsState } from "./types";
 
 import { connect } from "react-redux";
-import { State } from "../stores";
-import { updateBoard } from "../stores/lists/actions";
-import { getBoardNameInstance } from "../stores/lists/selectors";
+import { State } from "stores";
+import { updateBoard } from "stores/lists/actions";
+import { getBoardNameInstance } from "stores/lists/selectors";
 
 export interface LocalProps {
   id: string;

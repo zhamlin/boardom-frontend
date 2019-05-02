@@ -3,8 +3,8 @@ import { Draggable } from "react-beautiful-dnd";
 import { MemoizedPropsState } from "./types";
 
 import { connect } from "react-redux";
-import { State } from "../stores";
-import { getCardNameInstance } from "../stores/lists/selectors";
+import { State } from "stores";
+import { getCardNameInstance } from "stores/lists/selectors";
 
 export interface LocalProps {
   id: string;

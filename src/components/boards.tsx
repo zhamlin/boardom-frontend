@@ -7,9 +7,9 @@ import {
 import { MemoizedPropsState } from "./types";
 
 import { connect } from "react-redux";
-import { State } from "../stores";
-import { createBoard } from "../stores/lists/actions";
-import { selectBoards } from "../stores/lists/selectors";
+import { State } from "stores";
+import { createBoard } from "stores/lists/actions";
+import { selectBoards } from "stores/lists/selectors";
 
 export interface LocalProps {
   path: string;
@@ -50,9 +50,9 @@ export const Boards: React.FC<Props> = ({
               </article>
             );
           })}
-          <a onClick={handleNewBoard} className="button">
+          <button onClick={handleNewBoard} className="button">
             New Board
-          </a>
+          </button>
         </div>
       </div>
     </>

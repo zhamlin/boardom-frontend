@@ -3,11 +3,10 @@ import {
   applyMiddleware,
   combineReducers,
   compose,
-  createStore,
-  Store
+  createStore
 } from "redux";
-import asyncDispatchMiddleware from "../middleware/asyncDispatch";
-import Queue from "../offline/queue";
+import asyncDispatchMiddleware from "middleware/asyncDispatch";
+import Queue from "offline/queue";
 import lists, {
   initState as listsInit,
   PersistTransform as ListsTransform,
@@ -140,10 +139,10 @@ export class OfflineRecordItem<T extends OfflineResource> extends RecordItem<
   }
 }
 
-export function orderRecords<T extends { [k: string]: any } & IDAble, K extends keyof T>(
-  data: T[],
-  key: K
-): RecordItem<T> {
+export function orderRecords<
+  T extends { [k: string]: any } & IDAble,
+  K extends keyof T
+>(data: T[], key: K): RecordItem<T> {
   return new RecordItem<T>().fromArray(data, (obj: T, index) => {
     obj[key as string] = index;
     return obj;

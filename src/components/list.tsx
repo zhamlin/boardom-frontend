@@ -3,14 +3,14 @@ import { Draggable, Droppable } from "react-beautiful-dnd";
 import {
   getAllListCardsInstance,
   getListNameInstance
-} from "../stores/lists/selectors";
+} from "stores/lists/selectors";
 import { LocalProps as ListItemProps } from "./list_items";
 import ListItem from "./list_items";
 import { MemoizedPropsState } from "./types";
 
 import { connect } from "react-redux";
-import { State } from "../stores";
-import { createCard, updateListName } from "../stores/lists/actions";
+import { State } from "stores";
+import { createCard, updateListName } from "stores/lists/actions";
 
 export interface LocalProps {
   id: string;
@@ -115,9 +115,12 @@ export const List: React.FC<Props> = ({
               </ul>
             )}
           </Droppable>
-          <a onClick={handleAddCard} className="list-button button is-light">
+          <button
+            onClick={handleAddCard}
+            className="list-button button is-light"
+          >
             Add card
-          </a>
+          </button>
         </div>
       )}
     </Draggable>

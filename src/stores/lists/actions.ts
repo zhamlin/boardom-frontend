@@ -1,5 +1,5 @@
-import { actionCreator, OfflineRollback, OfflineSuccess } from "../../actions";
-import * as boards from "../../apis/boardom";
+import { actionCreator, OfflineRollback, OfflineSuccess } from "actions";
+import * as boards from "apis/boardom";
 
 export const actionList = actionCreator<Actions>();
 const api = new boards.BoardsApi({ basePath: "http://localhost:3000" });

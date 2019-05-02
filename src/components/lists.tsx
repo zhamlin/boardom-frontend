@@ -10,9 +10,9 @@ import List from "../components/list";
 import { MemoizedPropsState } from "./types";
 
 import { connect } from "react-redux";
-import { State } from "../stores";
-import { createList, moveCard, moveList } from "../stores/lists/actions";
-import { selectBoardLists } from "../stores/lists/selectors";
+import { State } from "stores";
+import { createList, moveCard, moveList } from "stores/lists/actions";
+import { selectBoardLists } from "stores/lists/selectors";
 
 export interface LocalProps {
   boardID: string;
@@ -90,9 +90,9 @@ export const Lists: React.FC<Props> = ({
               return <List position={l.position} id={l.id} key={l.id} />;
             })}
             {provided.placeholder}
-            <a className="button" onClick={onAddList}>
+            <button className="button" onClick={onAddList}>
               New List
-            </a>
+            </button>
           </div>
         )}
       </Droppable>

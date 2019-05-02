@@ -1,4 +1,4 @@
-import { Action } from "./actions";
+import { Action } from "actions";
 
 export class UnreachableCaseError extends Error {
   constructor(val: never) {

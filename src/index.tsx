@@ -1,13 +1,12 @@
 import React from "react";
 import ReactDOM from "react-dom";
-import "./index.css";
-import App from "./app";
+import "index.css";
+import App from "app";
 import * as serviceWorker from "./serviceWorker";
 
 import { Provider } from "react-redux";
 import { PersistGate } from "redux-persist/integration/react";
-import { makeStore } from "./stores";
-// import { cards } from "./stores/seed";
+import { makeStore } from "stores";
 
 export const { store, persistor } = makeStore();
 
