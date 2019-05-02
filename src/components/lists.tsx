@@ -56,14 +56,11 @@ export const Lists: React.FC<Props> = ({
         listMove(result.source.index, result.destination.index);
         break;
       case "list-item":
-        const sourceListID = result.source.droppableId.replace(/[^0-9]/g, "");
-        const destListID = result.destination.droppableId.replace(
-          /[^0-9]/g,
-          ""
-        );
+        const sourceListID = result.source.droppableId.replace("list-", "");
+        const destListID = result.destination.droppableId.replace("list-", "");
 
         moveCardAction(
-          result.draggableId.replace(/[^0-9]/g, ""),
+          result.draggableId.replace("list-item-", ""),
           { listID: sourceListID, index: result.source.index },
           { listID: destListID, index: result.destination.index }
         );

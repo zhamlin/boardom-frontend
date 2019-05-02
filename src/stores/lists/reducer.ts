@@ -91,6 +91,7 @@ function reducer(state: Readonly<State>, action: Actions): State {
       const { source, destination, id } = action.payload;
       if (source.listID === destination.listID) {
         const items = state.cards
+          .copy()
           .all()
           .filter(c => c.listID === source.listID)
           .sort((a, b) => a.position - b.position);

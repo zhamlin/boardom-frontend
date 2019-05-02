@@ -86,10 +86,10 @@ export const Board: React.FC<Props> = ({ id, name, updateBoardAction }) => {
 };
 
 const makeMapState: MemoizedPropsState<State, LocalProps, StateProps> = () => {
-  const getBoardName = getBoardNameInstance();
+  const namer = getBoardNameInstance();
   return (state, props) => {
     return {
-      name: getBoardName(state, props.id)
+      name: namer(state, props.id)
     };
   };
 };
