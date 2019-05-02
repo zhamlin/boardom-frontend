@@ -5,15 +5,23 @@ import { Boards, ListItems, Lists } from "./reducer";
 export const selectLists: Selector<State, Lists> = state => state.lists.items;
 export const selectBoards: Selector<State, Boards> = state =>
   state.lists.boards;
+
 export const selectCards: Selector<State, ListItems> = state =>
   state.lists.cards;
 export const selectItemID: ParametricSelector<State, any, string> = (_, id) =>
   id;
 
+const selectVisibleBoards = createSelector(
+  [selectBoards],
+  boards => {
+    return boards.where(b => !b.offline.deleted);
+  }
+);
+
 export const selectBoard = createSelector(
-  [selectBoards, selectItemID],
+  [selectVisibleBoards, selectItemID],
   (boards, id) => {
-    return boards.get(id)!;
+    return boards.get(id);
   }
 );
 
@@ -31,7 +39,7 @@ export const getBoardNameInstance = () =>
   createSelector(
     [selectBoard],
     board => {
-      return board.name;
+      return board!.name;
     }
   );
 

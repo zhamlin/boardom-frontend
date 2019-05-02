@@ -2,6 +2,9 @@
   "extends": ["tslint:recommended", "tslint-react", "tslint-config-prettier"],
   "defaultSeverity": "warning",
   "rules": {
+      "max-classes-per-file": [true, 10],
+      "strictPropertyInitialization": false,
+      "strictNullChecks": true,
       "no-unnecessary-type-assertion": true,
       "no-duplicate-switch-case": { "severity": "error" },
       "interface-name" : [true, "never-prefix"],

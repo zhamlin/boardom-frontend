@@ -4,7 +4,7 @@ import { MemoizedPropsState } from "./types";
 
 import { connect } from "react-redux";
 import { State } from "../stores";
-import { updateBoardName } from "../stores/lists/actions";
+import { updateBoard } from "../stores/lists/actions";
 import { getBoardNameInstance } from "../stores/lists/selectors";
 
 export interface LocalProps {
@@ -16,32 +16,35 @@ export interface StateProps {
 }
 
 export interface DispatchProps {
-  updateBoardNameAction: (name: string, id: string) => void;
+  updateBoardAction: (name: string, id: string) => void;
 }
 
 export type Props = LocalProps & StateProps & DispatchProps;
 
 const isDoneKey = (key: string) => key === "Enter" || key === "Escape";
 
-export const Board: React.FC<Props> = ({ id, name, updateBoardNameAction }) => {
+export const Board: React.FC<Props> = ({ id, name, updateBoardAction }) => {
   const [editingName, setEditingHidden] = React.useState<boolean>(false);
   const [newName, setNewName] = React.useState<string>(name);
 
   const handleClick = () => setEditingHidden(!editingName);
-  const handleFocus = (event: React.FocusEvent<HTMLInputElement>) =>
-    event.target.select();
+  const handleFocus = (i: React.FocusEvent<HTMLInputElement>) => {
+    i.currentTarget.select();
+  };
 
-  const updateValue = (value: string) => {
+  const updateName = (value: string) => {
+    if (value !== "" && value !== name) {
+      updateBoardAction(value, id);
+      setNewName(value);
+    }
     if (value === "") {
       setNewName(name);
-    } else {
-      updateBoardNameAction(value, id);
     }
   };
 
   const handleBlur = (event: React.FocusEvent<HTMLInputElement>) => {
     setEditingHidden(false);
-    updateValue(event.currentTarget.value);
+    updateName(event.currentTarget.value);
   };
 
   const handleInputChange = (event: React.FormEvent<HTMLInputElement>) => {
@@ -49,11 +52,13 @@ export const Board: React.FC<Props> = ({ id, name, updateBoardNameAction }) => {
   };
 
   const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
+    const value = event.currentTarget.value;
     if (isDoneKey(event.key)) {
       setEditingHidden(false);
+      updateName(value);
     }
-    updateValue(event.currentTarget.value);
   };
+
   return (
     <>
       <nav className="navbar is-dark">
@@ -64,11 +69,11 @@ export const Board: React.FC<Props> = ({ id, name, updateBoardNameAction }) => {
         )}
         {editingName && (
           <input
+            autoFocus={true}
             onKeyDown={handleKeyDown}
             onFocus={handleFocus}
             onBlur={handleBlur}
             onChange={handleInputChange}
-            value={newName}
             defaultValue={name}
             className="title"
             size={newName.length}
@@ -90,8 +95,7 @@ const makeMapState: MemoizedPropsState<State, LocalProps, StateProps> = () => {
 };
 
 const mapDispatchToProps: DispatchProps = {
-  updateBoardNameAction: (name: string, id: string) =>
-    updateBoardName({ id, name })
+  updateBoardAction: (name: string, id: string) => updateBoard({ id, name })
 };
 
 export default connect(

@@ -1,36 +1,49 @@
 import { createTransform } from "redux-persist";
+import { v4 as uuid } from "uuid";
+import { filterActions, UnreachableCaseError } from "../../util";
 import {
+  Key,
+  OfflineRecordItem,
+  OfflineResource,
+  orderRecords,
+  RecordItem
+} from "../index";
+import {
+  actionList,
+  Actions,
   CREATE_BOARD,
+  CREATE_BOARD_ROLLBACK,
+  CREATE_BOARD_SUCCESS,
   CREATE_CARD,
   CREATE_LIST,
   MOVE_CARD,
   MOVE_LIST,
-  UPDATE_BOARD_NAME,
+  UPDATE_BOARD,
+  UPDATE_BOARD_ROLLBACK,
+  UPDATE_BOARD_SUCCESS,
   UPDATE_LIST_NAME
-} from "../../constants/lists";
-import { orderRecords, RecordItem } from "../index";
-import { Actions } from "./actions";
+} from "./actions";
 
 export interface ListItem {
   id: string;
-  listID: string;
+  listID: Key<List, "id">;
   name: string;
   position: number;
-  boardID: string;
+  boardID: Key<Board, "id">;
 }
 export type ListItems = RecordItem<ListItem>;
 
-export interface Board {
+export interface Board extends OfflineResource {
   id: string;
   name: string;
 }
-export type Boards = RecordItem<Board>;
+export type Boards = OfflineRecordItem<Board>;
 
 export interface List {
   id: string;
   name: string;
   position: number;
-  boardID: string;
+  boardID: Key<Board, "id">;
 }
 export type Lists = RecordItem<List>;
 
@@ -48,6 +61,9 @@ export const PersistTransform = createTransform<State, State>(
 
   // transform state being rehydrated
   outboundState => {
+    if (outboundState === null || outboundState === undefined) {
+      return null as any;
+    }
     const { boards, items, cards } = outboundState;
     return {
       ...outboundState,
@@ -61,18 +77,15 @@ export const PersistTransform = createTransform<State, State>(
   { whitelist: ["lists"] }
 );
 
-let cardID = 0;
-let currentListID = 0;
-let boardID = 0;
-
-export default function reducer(
-  state: Readonly<State> = {
-    boards: new RecordItem<Board>(),
+export const initState = (): State => {
+  return {
+    boards: new OfflineRecordItem<Board>(),
     cards: new RecordItem<ListItem>(),
     items: new RecordItem<List>()
-  },
-  action: Actions
-): State {
+  };
+};
+
+function reducer(state: Readonly<State>, action: Actions): State {
   switch (action.type) {
     case MOVE_CARD: {
       const { source, destination, id } = action.payload;
@@ -131,49 +144,83 @@ export default function reducer(
     case UPDATE_LIST_NAME: {
       return {
         ...state,
-        items: state.items.update(action.payload.id, action.payload)
+        items: state.items.copy().update(action.payload.id, action.payload)
       };
     }
 
-    case UPDATE_BOARD_NAME: {
+    case CREATE_BOARD: {
+      const id = uuid();
+      action.payload.id = id;
       return {
         ...state,
-        boards: state.boards.update(action.payload.id, action.payload)
+        boards: state.boards.copy().update(id, {
+          ...action.payload,
+          offline: { created: false, deleted: false }
+        })
+      };
+    }
+
+    case CREATE_BOARD_ROLLBACK: {
+      return {
+        ...state,
+        boards: state.boards.copy().delete(action.meta.payload.id!)
+      };
+    }
+
+    case CREATE_BOARD_SUCCESS: {
+      // move to custom queue
+      const boards = state.boards
+        .copy()
+        .updateID(action.meta.payload.id!, action.payload.id!);
+      return {
+        ...state,
+        boards: boards.copy().update(action.payload.id!, {
+          ...action.payload
+        })
+      };
+    }
+
+    case UPDATE_BOARD: {
+      return {
+        ...state,
+        boards: state.boards.copy().update(action.payload.id, action.payload)
+      };
+    }
+
+    case UPDATE_BOARD_SUCCESS: {
+      return {
+        ...state,
+        boards: state.boards.copy().update(action.payload.id!, action.payload)
+      };
+    }
+
+    case UPDATE_BOARD_ROLLBACK: {
+      // restore to orignal state
+      return {
+        ...state
       };
     }
 
     case CREATE_CARD: {
-      const id = (cardID++).toString();
+      const id = uuid();
       action.payload.id = id;
       const { listID } = action.payload;
       return {
         ...state,
-        cards: state.cards.update(id, {
+        cards: state.cards.copy().update(id, {
           ...action.payload,
           position: state.cards.all().filter(c => c.listID === listID).length
         })
       };
     }
 
-    case CREATE_BOARD: {
-      const id = (boardID++).toString();
-      action.payload.id = id;
-
-      return {
-        ...state,
-        boards: state.boards.update(id, {
-          ...action.payload
-        })
-      };
-    }
-
     case CREATE_LIST: {
-      const id = (currentListID++).toString();
+      const id = uuid();
       action.payload.id = id;
 
       return {
         ...state,
-        items: state.items.update(id, {
+        items: state.items.copy().update(id, {
           ...action.payload,
           position: state.items.all().length
         })
@@ -181,6 +228,10 @@ export default function reducer(
     }
 
     default:
-      return state;
+      throw new UnreachableCaseError(action);
   }
 }
+
+// filter reducers down to actions we care about. Allows the switch
+// to be checked that it handles all possible actions.
+export default filterActions(reducer, a => actionList.isType(a.type));
