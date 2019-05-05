@@ -9,7 +9,6 @@ import {
 import asyncDispatchMiddleware from "middleware/asyncDispatch";
 import Queue from "offline/queue";
 import lists, {
-  PersistTransform as ListsTransform,
   initState as listsInit,
   State as ListsState
 } from "./lists/reducer";

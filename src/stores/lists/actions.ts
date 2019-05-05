@@ -1,7 +1,7 @@
 import { actionCreator, OfflineRollback, OfflineSuccess } from "actions";
 import * as boards from "apis/boardom";
 
-export const actionList = actionCreator<Actions>();
+export const actionList = actionCreator<ActionsType>();
 const api = new boards.BoardsApi({ basePath: "http://localhost:3000" });
 
 export const CREATE_LIST = "CREATE_LIST";
@@ -115,7 +115,7 @@ export const createBoard = actionList.newOfflineAction<
   return api.createBoard({ name: payload.name });
 });
 
-export type Actions =
+export type ActionsType =
   | CreateList
   | CreateCard
   | CreateBoard
