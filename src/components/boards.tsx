@@ -62,7 +62,7 @@ export const Boards: React.FC<Props> = ({
 const makeMapState: MemoizedPropsState<State, LocalProps, StateProps> = () => {
   return (state, props) => {
     return {
-      boards: selectBoards(state).all()
+      boards: selectBoards(state.lists).all()
     };
   };
 };

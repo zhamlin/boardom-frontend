@@ -3,21 +3,27 @@ import {
   applyMiddleware,
   combineReducers,
   compose,
+  Store,
   createStore
 } from "redux";
 import asyncDispatchMiddleware from "middleware/asyncDispatch";
 import Queue from "offline/queue";
 import lists, {
-  initState as listsInit,
   PersistTransform as ListsTransform,
+  initState as listsInit,
   State as ListsState
 } from "./lists/reducer";
 
+import { composeWithDevTools } from "redux-devtools-extension";
 import { createOffline } from "@redux-offline/redux-offline";
 import offlineConfig from "@redux-offline/redux-offline/lib/defaults";
-import { OfflineState as ReduxOfflineState } from "@redux-offline/redux-offline/lib/types";
-import { persistReducer, persistStore } from "redux-persist";
-import storage from "redux-persist/es/storage";
+import {
+  OfflineAction,
+  OfflineState as ReduxOfflineState
+} from "@redux-offline/redux-offline/lib/types";
+import { persistReducer, persistStore, Persistor } from "redux-persist";
+import storage from "localforage";
+import invariant from "redux-immutable-state-invariant";
 
 interface IDAble {
   id: string;
@@ -26,9 +32,9 @@ interface IDAble {
 export type Key<O, K extends keyof O> = O[K];
 
 export class RecordItem<T extends IDAble> {
-  public data: Record<string, T>;
+  public data: Readonly<Record<string, T>>;
 
-  constructor(data = {} as Record<T["id"], T>) {
+  constructor(data = {} as Record<string, T>) {
     this.data = data;
   }
 
@@ -61,29 +67,23 @@ export class RecordItem<T extends IDAble> {
     return this.data[id];
   };
 
-  public delete = (id: string): this => {
-    if (!this.hasID(id)) {
-      return this;
-    }
-    delete this.data[id];
-    return this;
+  public delete = (id: string): RecordItem<T> => {
+    const data = { ...this.data };
+    delete data[id];
+    return new RecordItem<T>(data);
   };
 
-  public updateID(from: string, to: string): this {
-    this.data[to] = { ...this.data[from], id: to };
-    delete this.data[from];
-    return this;
+  public updateID(from: string, to: string): RecordItem<T> {
+    const data = { ...this.data, [to]: this.data[from] };
+    delete data[from];
+    return new RecordItem<T>(data);
   }
 
-  public update(id: string, obj: Partial<T>): this {
+  public update(id: string, obj: Partial<T>): RecordItem<T> {
     const newItem = { ...this.data[id], ...obj };
-    this.data[id] = newItem;
-    return this;
+    const data = { ...this.data, [id]: newItem };
+    return new RecordItem<T>(data);
   }
-
-  public copy = (): RecordItem<T> => {
-    return new RecordItem<T>(this.data);
-  };
 
   public hasID = (id: string): boolean => {
     return id in this.data;
@@ -97,62 +97,19 @@ export interface OfflineResource extends IDAble {
   };
 }
 
-export class OfflineRecordItem<T extends OfflineResource> extends RecordItem<
-  T
-> {
-  public copy = (): OfflineRecordItem<T> => {
-    return new OfflineRecordItem<T>(this.data);
-  };
-
-  public fromArray(
-    a: T[],
-    transformer?: (o: T, index: number) => T
-  ): OfflineRecordItem<T> {
-    const map = a.reduce(
-      (m, obj, index) => {
-        if (transformer !== undefined) {
-          obj = transformer(obj, index);
-        }
-        m[obj.id] = obj;
-        return m;
-      },
-      {} as Record<string, T>
-    );
-    return new OfflineRecordItem<T>(map);
-  }
-
-  public where = (fn: (obj: T) => boolean): OfflineRecordItem<T> => {
-    return this.fromArray(this.all().filter(fn));
-  };
-
-  public update(id: T["id"], obj: Partial<T>): this {
-    // const isCreated = this.get(id)!.offline.created;
-    // if (!isCreated) {
-    // }
-    RecordItem.prototype.update.call(this, id, obj);
-    return this;
-  }
-
-  public markDeleted(id: T["id"]): this {
-    this.data[id].offline.deleted = true;
-    return this;
-  }
-}
-
 export function orderRecords<
   T extends { [k: string]: any } & IDAble,
   K extends keyof T
 >(data: T[], key: K): RecordItem<T> {
   return new RecordItem<T>().fromArray(data, (obj: T, index) => {
-    obj[key as string] = index;
-    return obj;
+    return { ...obj, [key as string]: index };
   });
 }
 
 const persistConfig = {
   key: "root",
   storage,
-  transforms: [ListsTransform],
+  transforms: [],
   whitelist: ["lists", "offline"]
 };
 
@@ -178,31 +135,58 @@ const {
   // },
   persist: false as any,
   queue,
+  discard: (
+    error: any,
+    action: OfflineAction,
+    _retries: number = 0
+  ): boolean => {
+    console.log("discard: ", error, action);
+    // not a network error -> discard
+    if (!("status" in error)) {
+      return true;
+    }
+
+    // discard http 4xx errors
+    return error.status >= 400 && error.status < 500;
+  },
+
   effect: async (effect, action) => {
+    if (typeof effect !== "function") {
+      console.log(effect);
+      return;
+    }
     try {
       return await effect(action.payload);
     } catch (err) {
+      console.log(err);
+      if ("type" in err && err.type == "basic") {
+        throw err;
+      }
       throw await err.json();
     }
   }
 });
 
 export interface State {
+  [k: string]: any;
   lists: ListsState;
   offline?: ReduxOfflineState;
 }
 
-const rootReducer = combineReducers<State>({
-  lists
-});
+const createReducer = () => {
+  const rootReducer = combineReducers<State>({
+    lists
+  });
 
-const persistedReducer = persistReducer(
-  persistConfig,
-  offlineEnhanceReducer(rootReducer)
-);
+  const persistedReducer = persistReducer(
+    persistConfig,
+    offlineEnhanceReducer(rootReducer)
+  );
+  return persistedReducer;
+};
 
 const composeEnhancers = (window as any).__REDUX_DEVTOOLS_EXTENSION_COMPOSE__
-  ? (window as any).__REDUX_DEVTOOLS_EXTENSION_COMPOSE__({ trace: true })
+  ? composeWithDevTools({ trace: true, traceLimit: 25 })
   : compose;
 
 const enhanceOffline = (
@@ -222,30 +206,15 @@ export function makeStore(
   state: State = {
     lists: listsInit()
   }
-) {
+): { persistor: Persistor; store: Store<State> } {
   const store = createStore(
-    persistedReducer,
-    state as any,
+    createReducer(),
+    state,
     composeEnhancers(
-      offlineEnhanceStore,
-      applyMiddleware(offlineMiddleware, asyncDispatchMiddleware)
+      applyMiddleware(invariant(), offlineMiddleware, asyncDispatchMiddleware),
+      offlineEnhanceStore
     )
   );
-
-  if ((module as any).hot) {
-    // Enable Webpack hot module replacement for reducers
-    (module as any).hot.accept("../stores", () => {
-      const lists = require("./lists/reducer").default;
-      const rootReducer = combineReducers<State>({
-        lists
-      });
-      const nextReducer = persistReducer(
-        persistConfig,
-        offlineEnhanceReducer(rootReducer)
-      );
-      store.replaceReducer(enhanceOffline(nextReducer));
-    });
-  }
 
   const persistor = persistStore(store);
   return { persistor, store };

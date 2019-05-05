@@ -82,6 +82,10 @@ class ActionCreator<A> {
     this.actions = {};
   }
 
+  public isActionType = (action: Action<any>): boolean => {
+    return this.actions[action.type];
+  };
+
   public isType = (type: string): boolean => {
     return this.actions[type];
   };

@@ -132,8 +132,8 @@ const makeMapState: MemoizedPropsState<State, LocalProps, StateProps> = () => {
   const getAllListCards = getAllListCardsInstance();
   return (state, props) => {
     return {
-      items: getAllListCards(state, props.id),
-      name: getListName(state, props.id)
+      items: getAllListCards(state.lists, props.id),
+      name: getListName(state.lists, props.id)
     };
   };
 };

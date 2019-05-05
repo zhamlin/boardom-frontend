@@ -89,7 +89,7 @@ const makeMapState: MemoizedPropsState<State, LocalProps, StateProps> = () => {
   const namer = getBoardNameInstance();
   return (state, props) => {
     return {
-      name: namer(state, props.id)
+      name: namer(state.lists, props.id)
     };
   };
 };

@@ -37,7 +37,7 @@ function NotFound({ location }: RouteComponentProps) {
 }
 
 function BoardRoute({ match, location }: RouteComponentProps<BoardProps>) {
-  if (selectBoard(store.getState(), match.params.id) == null) {
+  if (selectBoard(store.getState().lists, match.params.id) == null) {
     return NotFound({ location } as RouteComponentProps);
   }
   return <Board id={match.params.id} />;

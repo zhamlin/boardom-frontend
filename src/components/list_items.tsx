@@ -51,7 +51,7 @@ const makeMapState: MemoizedPropsState<State, LocalProps, StateProps> = () => {
   const getCardName = getCardNameInstance();
   return (state, props) => {
     return {
-      name: getCardName(state, props.id)
+      name: getCardName(state.lists, props.id)
     };
   };
 };

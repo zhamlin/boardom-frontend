@@ -101,7 +101,7 @@ const makeMapState: MemoizedPropsState<State, LocalProps, StateProps> = () => {
   return (state, props) => {
     return {
       defaultListName: "list",
-      lists: selectBoardLists(state, props.boardID)
+      lists: selectBoardLists(state.lists, props.boardID)
     };
   };
 };

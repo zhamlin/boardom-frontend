@@ -1,32 +1,42 @@
 import { createSelector, ParametricSelector, Selector } from "reselect";
-import { State } from "../index";
-import { Boards, ListItems, Lists } from "./reducer";
+import { State, Schema, database } from "./reducer";
 
-export const selectLists: Selector<State, Lists> = state => state.lists.items;
-export const selectBoards: Selector<State, Boards> = state =>
-  state.lists.boards;
+export const selectSession: Selector<State, Schema> = state =>
+  database.session(state.db);
 
-export const selectCards: Selector<State, ListItems> = state =>
-  state.lists.cards;
-export const selectItemID: ParametricSelector<State, any, string> = (_, id) =>
+export const selectItemIDF: ParametricSelector<State, any, string> = (_, id) =>
   id;
 
-const selectVisibleBoards = createSelector(
-  [selectBoards],
-  boards => {
-    return boards.where(b => !b.offline.deleted);
+export const selectCards = createSelector(
+  [selectSession],
+  sess => {
+    return sess.ListItem;
+  }
+);
+
+export const selectBoards = createSelector(
+  [selectSession],
+  sess => {
+    return sess.Board;
+  }
+);
+
+export const selectLists = createSelector(
+  [selectSession],
+  sess => {
+    return sess.List;
   }
 );
 
 export const selectBoard = createSelector(
-  [selectVisibleBoards, selectItemID],
+  [selectBoards, selectItemIDF],
   (boards, id) => {
     return boards.get(id);
   }
 );
 
 export const selectBoardLists = createSelector(
-  [selectLists, selectItemID],
+  [selectLists, selectItemIDF],
   (lists, id) => {
     return lists
       .all()
@@ -44,14 +54,14 @@ export const getBoardNameInstance = () =>
   );
 
 const selectList = createSelector(
-  [selectLists, selectItemID],
+  [selectLists, selectItemIDF],
   (lists, id) => {
     return lists.get(id)!;
   }
 );
 
 const selectCard = createSelector(
-  [selectCards, selectItemID],
+  [selectCards, selectItemIDF],
   (cards, id) => {
     return cards.get(id)!;
   }
@@ -59,7 +69,7 @@ const selectCard = createSelector(
 
 export const getAllListCardsInstance = () =>
   createSelector(
-    [selectCards, selectItemID],
+    [selectCards, selectItemIDF],
     (cards, id) => {
       return cards
         .all()
@@ -79,7 +89,7 @@ export const getListNameInstance = () =>
 export const getAllListsInstance = () =>
   createSelector(
     [selectLists],
-    (lists: Lists) => {
+    lists => {
       return lists.all().sort((a, b) => a.position - b.position);
     }
   );
