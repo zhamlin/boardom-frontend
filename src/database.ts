@@ -1,5 +1,3 @@
-import { createSelector, ParametricSelector, Selector } from "reselect";
-
 interface IDAble {
   id: string;
 }
