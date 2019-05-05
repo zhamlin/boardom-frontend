@@ -50,23 +50,25 @@ function BoardsRoute({ match }: RouteComponentProps<BoardsProps>) {
 class App extends React.Component {
   public render() {
     return (
-      <Router>
-        <nav className="navbar app is-danger">
-          <Link className="navbar-item" to="/">
-            Home
-          </Link>
-          <Link className="navbar-item" to="/boards">
-            Boards
-          </Link>
-        </nav>
+      <React.StrictMode>
+        <Router>
+          <nav className="navbar app is-danger">
+            <Link className="navbar-item" to="/">
+              Home
+            </Link>
+            <Link className="navbar-item" to="/boards">
+              Boards
+            </Link>
+          </nav>
 
-        <Switch>
-          <Route exact={true} path="/" component={Home} />
-          <Route exact={true} path="/boards" component={BoardsRoute} />
-          <Route exact={true} path="/boards/:id" component={BoardRoute} />
-          <Route component={NotFound} />
-        </Switch>
-      </Router>
+          <Switch>
+            <Route exact={true} path="/" component={Home} />
+            <Route exact={true} path="/boards" component={BoardsRoute} />
+            <Route exact={true} path="/boards/:id" component={BoardRoute} />
+            <Route component={NotFound} />
+          </Switch>
+        </Router>
+      </React.StrictMode>
     );
   }
 }
