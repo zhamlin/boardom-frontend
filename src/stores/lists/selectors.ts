@@ -4,7 +4,7 @@ import { State, Schema, database } from "./reducer";
 export const selectSession: Selector<State, Schema> = state =>
   database.session(state.db);
 
-export const selectItemIDF: ParametricSelector<State, any, string> = (_, id) =>
+export const selectItemID: ParametricSelector<State, any, string> = (_, id) =>
   id;
 
 export const selectCards = createSelector(
@@ -29,14 +29,14 @@ export const selectLists = createSelector(
 );
 
 export const selectBoard = createSelector(
-  [selectBoards, selectItemIDF],
+  [selectBoards, selectItemID],
   (boards, id) => {
     return boards.get(id);
   }
 );
 
 export const selectBoardLists = createSelector(
-  [selectLists, selectItemIDF],
+  [selectLists, selectItemID],
   (lists, id) => {
     return lists
       .all()
@@ -54,14 +54,14 @@ export const getBoardNameInstance = () =>
   );
 
 const selectList = createSelector(
-  [selectLists, selectItemIDF],
+  [selectLists, selectItemID],
   (lists, id) => {
     return lists.get(id)!;
   }
 );
 
 const selectCard = createSelector(
-  [selectCards, selectItemIDF],
+  [selectCards, selectItemID],
   (cards, id) => {
     return cards.get(id)!;
   }
@@ -69,7 +69,7 @@ const selectCard = createSelector(
 
 export const getAllListCardsInstance = () =>
   createSelector(
-    [selectCards, selectItemIDF],
+    [selectCards, selectItemID],
     (cards, id) => {
       return cards
         .all()
