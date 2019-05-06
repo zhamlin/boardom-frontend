@@ -13,7 +13,7 @@ interface Many2Many {
 export type HasMany<T extends IDAble> = () => HasManyClass<T>;
 
 export class HasManyClass<T extends IDAble> {
-  public link: Table<T>;
+  private link: Table<T>;
   private linkField: string;
   private id: string;
 
@@ -27,10 +27,8 @@ export class HasManyClass<T extends IDAble> {
     m.update({ [this.linkField]: this.id } as any);
   }
 
-  remove(id: string): Model<T> & T {
-    const item = this.link.get(id)!;
-    item.update({ [this.linkField]: undefined } as any);
-    return item;
+  remove(m: Model<T> & T) {
+    m.update({ [this.linkField]: undefined } as any);
   }
 
   all() {
@@ -64,8 +62,7 @@ interface FieldType {
 type FieldTypes = FieldType | HasManyType;
 type Fields = { [field: string]: FieldTypes };
 
-interface ModelExtra<T extends IDAble> {
-  state: Table<T>;
+interface ModelExtra {
   session: { [k: string]: Table<Model<any>> };
 }
 
@@ -75,14 +72,16 @@ export class Model<T extends IDAble> {
   static many() {}
 
   public id: string;
-  public state: Table<T>;
+  private state: Table<T>;
 
-  public fields() {
-    return this.fields;
+  constructor(fields: Partial<T>, state: Table<T>) {
+    Object.assign(this, fields);
+    this.state = state;
   }
 
-  constructor(fields: Partial<T>) {
-    Object.assign(this, fields);
+  public clean() {
+    const { state, ...other } = this;
+    return other;
   }
 
   public updateID(newID: string): this {
@@ -91,20 +90,18 @@ export class Model<T extends IDAble> {
     }
 
     const oldID = this.id;
-    const item = { ...this.state.itemsByID[oldID], id: newID };
-    this.state.itemsByID[newID] = item;
+    Object.assign(this, { ...this.state.itemsByID[oldID], id: newID });
+    this.state.itemsByID[newID] = this as any;
     delete this.state.itemsByID[oldID];
-    this.id = newID;
     return this;
   }
 
   public update(args: Partial<T>): this {
     const { id, ...noid } = args;
-    this.state.itemsByID[this.id] = {
+    Object.assign(this.state.itemsByID[this.id], {
       ...this.state.itemsByID[this.id],
       ...noid
-    };
-    Object.assign(this, noid);
+    });
     return this;
   }
 
@@ -114,15 +111,11 @@ export class Model<T extends IDAble> {
 }
 
 interface ModelFunctionConstructor<A extends IDAble, R> {
-  new (fields: Partial<A>, extra?: ModelExtra<A>): R;
-  (fields: Partial<A>, extra?: ModelExtra<A>): R;
+  new (fields: Partial<A>, state: Table<A>, extra?: ModelExtra): R;
+  (fields: Partial<A>, state: Table<A>, extra?: ModelExtra): R;
   readonly prototype: R;
 }
-type Constructor<A extends IDAble, R, T> = ModelFunctionConstructor<
-  A & ModelExtra<A>,
-  R
-> &
-  T;
+type Constructor<A extends IDAble, R, T> = ModelFunctionConstructor<A, R> & T;
 
 type StaticModel<T extends IDAble> = Constructor<
   T,
@@ -145,13 +138,16 @@ export function createClass<Fields extends IDAble>(
   fields: { [T in keyof Fields]: FieldTypes }
 ): StaticModel<Fields> {
   const model = class extends Model<Fields> {
-    constructor(args: Partial<Fields> = {}, extra?: ModelExtra<Fields>) {
-      super(args);
+    constructor(
+      args: Partial<Fields> = {},
+      state: Table<Fields>,
+      extra?: ModelExtra
+    ) {
+      super(args, state);
 
       if (extra === undefined) {
         return this;
       }
-      this.state = extra.state;
 
       const links = Object.entries(fields)
         .filter(value => value[1].type !== "field")
@@ -184,22 +180,6 @@ export class Table<Item extends IDAble> {
   private model: StaticModel<any>;
   private session: { [k: string]: Table<any> };
 
-  public static fromArray<T extends IDAble>(
-    items: T[],
-    constructor: StaticModel<any>,
-    session: { [k: string]: Table<any> },
-    state: boolean = true
-  ) {
-    const map = items.reduce(
-      (m, obj) => {
-        m[obj.id] = obj;
-        return m;
-      },
-      {} as any
-    );
-    return new Table<T>(map, constructor, session, state);
-  }
-
   public updateAll = (...items: Array<Model<Item> & Item>) => {
     items.forEach(i => {
       this.itemsByID[i.id] = i;
@@ -209,7 +189,7 @@ export class Table<Item extends IDAble> {
   public commit = () => {
     const items = { ...this.itemsByID };
     Object.keys(items).forEach(id => {
-      const { state, ...other } = this.itemsByID[id];
+      const other = this.itemsByID[id].clean();
       items[id] = other as any;
     });
     return { itemsByID: items };
@@ -224,10 +204,7 @@ export class Table<Item extends IDAble> {
   };
 
   public create = (args?: Partial<Item> & IDAble): Model<Item> & Item => {
-    const item = new this.model(
-      { ...args },
-      { state: this, session: this.session }
-    );
+    const item = new this.model({ ...args }, this, { session: this.session });
     this.itemsByID[item.id] = item;
     return item;
   };
@@ -235,22 +212,18 @@ export class Table<Item extends IDAble> {
   constructor(
     items: { [id: string]: Model<Item> & Item },
     constructor: StaticModel<any>,
-    session: { [k: string]: Table<any> },
-    state: boolean = true
+    session: { [k: string]: Table<any> }
   ) {
     this.itemsByID = items || {};
     this.session = session;
     this.model = constructor;
 
-    if (state) {
-      Object.keys(this.itemsByID).forEach(
-        id =>
-          (this.itemsByID[id] = new constructor(this.itemsByID[id], {
-            session: this.session,
-            state: this
-          }))
-      );
-    }
+    Object.keys(this.itemsByID).forEach(
+      id =>
+        (this.itemsByID[id] = new constructor(this.itemsByID[id], this, {
+          session: this.session
+        }))
+    );
   }
 }
 

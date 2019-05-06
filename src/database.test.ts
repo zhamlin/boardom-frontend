@@ -42,26 +42,30 @@ it("has many", () => {
 
   const sess = db.session(db.emptyState());
   const b = sess.Board.create({ id: "1", name: "testing" });
+
   sess.List.create({ id: "1", name: "testing" });
   const list = sess.List.create({ id: "one" });
   b.lists().add(list);
-  expect(b.lists().all().length).toBe(1);
-  expect(b.lists().link.itemsByID).toMatchObject({
-    one: { id: "one", boardID: "1" }
-  });
 
+  expect(b.lists().all().length).toBe(1);
   expect(sess.List.all().length).toBe(2);
   expect(sess.List).toMatchObject({
-    itemsByID: { one: { id: "one", boardID: "1" } }
+    itemsByID: {
+      one: { id: "one", boardID: "1" },
+      "1": { id: "1", name: "testing" }
+    }
   });
 
-  const todelete = b.lists().remove("1");
-  todelete.delete();
+  b.lists().remove(list);
+  expect(list).toMatchObject({
+    id: "one"
+  });
+  list.delete();
 
   const newState = db.commit(sess);
   expect(Object.values(newState.List.itemsByID).length).toBe(1);
   expect(newState.List).toMatchObject({
-    itemsByID: { one: { id: "one" } }
+    itemsByID: { "1": { id: "1" } }
   });
 });
 
