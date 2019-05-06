@@ -24,11 +24,7 @@ interface Schema {
   Board: Table<Board>;
 }
 
-it("hasmany", () => {
-  const x = { foo: true };
-  const y = x.foo;
-  x.foo = false;
-  console.log(x, y);
+it("has many", () => {
   const ListModel = createClass<List>("List", {
     id: field(),
     name: field(),

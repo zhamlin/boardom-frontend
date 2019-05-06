@@ -2,22 +2,6 @@ export const Start = "start";
 export const Success = "success";
 export const Failure = "failure";
 
-// export type AsyncStatus = typeof Start | typeof Success | typeof Failure;
-
-// type AsyncStatusHandler<T> = { [K in AsyncStatus]?: (state: T) => T };
-
-// export function handleAsyncAction<S, A, E>(
-//   state: S,
-//   action: AsyncAction<A, E>,
-//   handler: AsyncStatusHandler<S>
-// ): S {
-//   let fn = handler[action.meta.status];
-//   if (!fn) {
-//     fn = s => s;
-//   }
-//   return fn(state);
-// }
-
 export interface Action<T> {
   type: T;
 }

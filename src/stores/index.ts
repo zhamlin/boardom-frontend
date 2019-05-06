@@ -65,7 +65,7 @@ const {
       return await effect(action.payload);
     } catch (err) {
       console.log(err);
-      if ("type" in err && err.type == "basic") {
+      if ("type" in err && err.type === "basic") {
         throw err;
       }
       throw await err.json();
