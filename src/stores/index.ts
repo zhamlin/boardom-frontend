@@ -1,5 +1,4 @@
 import {
-  Action,
   applyMiddleware,
   combineReducers,
   compose,
@@ -24,87 +23,6 @@ import { persistReducer, persistStore, Persistor } from "redux-persist";
 import storage from "localforage";
 import invariant from "redux-immutable-state-invariant";
 
-interface IDAble {
-  id: string;
-}
-
-export type Key<O, K extends keyof O> = O[K];
-
-export class RecordItem<T extends IDAble> {
-  public data: Readonly<Record<string, T>>;
-
-  constructor(data = {} as Record<string, T>) {
-    this.data = data;
-  }
-
-  public fromArray(
-    a: T[],
-    transformer?: (o: T, index: number) => T
-  ): RecordItem<T> {
-    const map = a.reduce(
-      (m, obj, index) => {
-        if (transformer !== undefined) {
-          obj = transformer(obj, index);
-        }
-        m[obj.id] = obj;
-        return m;
-      },
-      {} as Record<string, T>
-    );
-    return new RecordItem<T>(map);
-  }
-
-  public all = (): T[] => {
-    return Object.values(this.data);
-  };
-
-  public where = (fn: (obj: T) => boolean): RecordItem<T> => {
-    return this.fromArray(this.all().filter(fn));
-  };
-
-  public get = (id: string): T | null => {
-    return this.data[id];
-  };
-
-  public delete = (id: string): RecordItem<T> => {
-    const data = { ...this.data };
-    delete data[id];
-    return new RecordItem<T>(data);
-  };
-
-  public updateID(from: string, to: string): RecordItem<T> {
-    const data = { ...this.data, [to]: this.data[from] };
-    delete data[from];
-    return new RecordItem<T>(data);
-  }
-
-  public update(id: string, obj: Partial<T>): RecordItem<T> {
-    const newItem = { ...this.data[id], ...obj };
-    const data = { ...this.data, [id]: newItem };
-    return new RecordItem<T>(data);
-  }
-
-  public hasID = (id: string): boolean => {
-    return id in this.data;
-  };
-}
-
-export interface OfflineResource extends IDAble {
-  offline: {
-    created: boolean;
-    deleted: boolean;
-  };
-}
-
-export function orderRecords<
-  T extends { [k: string]: any } & IDAble,
-  K extends keyof T
->(data: T[], key: K): RecordItem<T> {
-  return new RecordItem<T>().fromArray(data, (obj: T, index) => {
-    return { ...obj, [key as string]: index };
-  });
-}
-
 const persistConfig = {
   key: "root",
   storage,
@@ -122,16 +40,6 @@ const {
   enhanceStore: offlineEnhanceStore
 } = createOffline({
   ...offlineConfig,
-  // offlineStateLens: (state: State): any => {
-  //   const { offline, ...rest } = state;
-  //   return {
-  //     get: offline,
-  //     set: (offlineState: any) =>
-  //       typeof offlineState === "undefined"
-  //         ? rest
-  //         : { offline: offlineState, ...rest }
-  //   };
-  // },
   persist: false as any,
   queue,
   discard: (
@@ -151,7 +59,6 @@ const {
 
   effect: async (effect, action) => {
     if (typeof effect !== "function") {
-      console.log(effect);
       return;
     }
     try {
@@ -167,7 +74,6 @@ const {
 });
 
 export interface State {
-  [k: string]: any;
   lists: ListsState;
   offline?: ReduxOfflineState;
 }
@@ -188,19 +94,6 @@ const composeEnhancers = (window as any).__REDUX_DEVTOOLS_EXTENSION_COMPOSE__
   ? composeWithDevTools({ trace: true, traceLimit: 25 })
   : compose;
 
-const enhanceOffline = (
-  reducer: (state: State, action: Action<any>) => State
-) => {
-  // take original reducer and return new one:
-  return function(state: State, action: Action<any>): State {
-    switch (action.type) {
-      default:
-        // just proxy all other actions
-        return reducer(state, action);
-    }
-  };
-};
-
 export function makeStore(
   state: State = {
     lists: listsInit()
@@ -208,7 +101,7 @@ export function makeStore(
 ): { persistor: Persistor; store: Store<State> } {
   const store = createStore(
     createReducer(),
-    state,
+    state as any,
     composeEnhancers(
       applyMiddleware(invariant(), offlineMiddleware, asyncDispatchMiddleware),
       offlineEnhanceStore
