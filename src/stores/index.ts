@@ -103,8 +103,12 @@ export function makeStore(
     createReducer(),
     state as any,
     composeEnhancers(
-      applyMiddleware(invariant(), offlineMiddleware, asyncDispatchMiddleware),
-      offlineEnhanceStore
+      offlineEnhanceStore as any,
+      applyMiddleware(
+        invariant(),
+        offlineMiddleware,
+        asyncDispatchMiddleware
+      ) as any
     )
   );
 
