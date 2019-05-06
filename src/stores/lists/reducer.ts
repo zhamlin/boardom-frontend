@@ -42,6 +42,7 @@ const ListItemModel = createClass<ListItem>("ListItem", {
 export interface Board {
   id: string;
   name: string;
+  lists: HasMany<List>;
 }
 
 export interface List {
@@ -61,7 +62,8 @@ const ListModel = createClass<List>("List", {
 
 const BoardModel = createClass<Board>("Board", {
   id: field(),
-  name: field()
+  name: field(),
+  lists: hasMany<List>(ListModel.modelName, "boardID")
 });
 
 export interface Schema {
