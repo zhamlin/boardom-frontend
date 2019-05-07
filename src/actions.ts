@@ -1,7 +1,3 @@
-export const Start = "start";
-export const Success = "success";
-export const Failure = "failure";
-
 export interface Action<T> {
   type: T;
 }
