@@ -1,5 +1,5 @@
 import { createSelector, ParametricSelector, Selector } from "reselect";
-import { State, Schema, database } from "./reducer";
+import { State, Schema, database } from "./models";
 
 export const selectSession: Selector<State, Schema> = state =>
   database.session(state.db);

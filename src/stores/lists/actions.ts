@@ -32,7 +32,7 @@ export interface CreateCard {
   type: typeof CREATE_CARD;
   payload: {
     name: string;
-    id: string;
+    id?: string;
     listID: string;
   };
 }
@@ -107,6 +107,7 @@ export interface CreateBoard {
   };
 }
 
+// all of the names can be derived from a model
 export const createBoard = actionList.newOfflineAction<
   CreateBoard,
   CreateBoardSuccess,

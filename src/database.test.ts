@@ -1,4 +1,5 @@
 import {
+  uuid,
   field,
   Table,
   Database,
@@ -79,4 +80,21 @@ it("preforms basic CRUD", () => {
   db.register(BoardModel);
 
   const sess = db.session(db.emptyState());
+});
+
+it("uuid default works", () => {
+  const ListModel = createClass<List>("List", {
+    id: uuid(),
+    name: field(),
+    position: field(),
+    boardID: field()
+  });
+
+  const db = new Database<Schema>();
+  db.register(ListModel);
+  const sess = db.session(db.emptyState());
+  const list = sess.List.create();
+  const list2 = sess.List.create({ id: "test" });
+  expect(list.id).toBeDefined();
+  expect(list2.id).toEqual("test");
 });

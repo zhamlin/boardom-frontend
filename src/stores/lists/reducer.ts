@@ -1,13 +1,4 @@
-import { v4 as uuid } from "uuid";
 import { filterActions, UnreachableCaseError } from "../../util";
-import {
-  field,
-  Table,
-  createClass,
-  Database,
-  HasMany,
-  hasMany
-} from "database";
 import {
   actionList,
   ActionsType,
@@ -24,66 +15,7 @@ import {
   UPDATE_LIST_NAME
 } from "./actions";
 
-export interface ListItem {
-  id: string;
-  listID: string;
-  name: string;
-  position: number;
-  boardID: string;
-}
-const ListItemModel = createClass<ListItem>("ListItem", {
-  id: field(),
-  name: field(),
-  position: field(),
-  boardID: field(),
-  listID: field()
-});
-
-export interface Board {
-  id: string;
-  name: string;
-  lists: HasMany<List>;
-}
-
-export interface List {
-  id: string;
-  name: string;
-  position: number;
-  boardID: string;
-  cards: HasMany<ListItem>;
-}
-const ListModel = createClass<List>("List", {
-  id: field(),
-  name: field(),
-  position: field(),
-  boardID: field(),
-  cards: hasMany<ListItem>(ListItemModel.modelName, "listID")
-});
-
-const BoardModel = createClass<Board>("Board", {
-  id: field(),
-  name: field(),
-  lists: hasMany<List>(ListModel.modelName, "boardID")
-});
-
-export interface Schema {
-  Board: Table<Board>;
-  List: Table<List>;
-  ListItem: Table<ListItem>;
-}
-
-export const database = new Database<Schema>();
-database.register(BoardModel, ListModel, ListItemModel);
-
-export interface State {
-  db: Schema;
-}
-
-export const initState = (): State => {
-  return {
-    db: database.emptyState()
-  };
-};
+import { database, State, test } from "./models";
 
 function updatePosition<T extends { position: number }>(
   items: T[],
@@ -104,6 +36,7 @@ function order<T extends { position: number }>(items: T[]) {
 }
 
 function reducer(state: Readonly<State>, action: ActionsType): State {
+  state = test(state, action);
   const sess = database.session(state.db);
   switch (action.type) {
     case MOVE_CARD: {
@@ -161,67 +94,13 @@ function reducer(state: Readonly<State>, action: ActionsType): State {
       };
     }
 
-    case CREATE_BOARD: {
-      const id = uuid();
-      action.payload.id = id;
-      sess.Board.create({ id: id, ...action.payload });
-      return {
-        ...state,
-        db: database.commit(sess)
-      };
-    }
-
-    case CREATE_BOARD_ROLLBACK: {
-      sess.Board.get(action.meta.payload.id!)!.delete();
-      return {
-        ...state,
-        db: database.commit(sess)
-      };
-    }
-
-    case CREATE_BOARD_SUCCESS: {
-      sess.Board.get(action.meta.payload.id!)!
-        .update(action.payload)
-        .updateID(action.payload.id!);
-      return {
-        ...state,
-        db: database.commit(sess)
-      };
-    }
-
-    case UPDATE_BOARD: {
-      sess.Board.get(action.payload.id)!.update(action.payload);
-      return {
-        ...state,
-        db: database.commit(sess)
-      };
-    }
-
-    case UPDATE_BOARD_SUCCESS: {
-      sess.Board.get(action.payload.id!)!.update(action.payload);
-      return {
-        ...state,
-        db: database.commit(sess)
-      };
-    }
-
-    case UPDATE_BOARD_ROLLBACK: {
-      // restore to orignal state
-      return {
-        ...state
-      };
-    }
-
     case CREATE_CARD: {
-      const id = uuid();
       const list = sess.List.get(action.payload.listID)!;
-
-      action.payload.id = id;
       const c = sess.ListItem.create({
         ...action.payload,
         position: list.cards().all().length
       });
-      list.cards().add(c);
+      action.payload.id = c.id;
       return {
         ...state,
         db: database.commit(sess)
@@ -229,13 +108,11 @@ function reducer(state: Readonly<State>, action: ActionsType): State {
     }
 
     case CREATE_LIST: {
-      const id = uuid();
-      action.payload.id = id;
-      sess.List.create({
+      const l = sess.List.create({
         ...action.payload,
-        id: id,
         position: sess.List.all().length
       });
+      action.payload.id = l.id;
 
       return {
         ...state,
@@ -243,9 +120,10 @@ function reducer(state: Readonly<State>, action: ActionsType): State {
       };
     }
 
-    default:
-      throw new UnreachableCaseError(action);
+    // default:
+    // throw new UnreachableCaseError(action);
   }
+  return { ...state };
 }
 
 // filter reducers down to actions we care about. Allows the switch

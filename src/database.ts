@@ -1,3 +1,5 @@
+import { v4 as uuidGen } from "uuid";
+
 interface IDAble {
   id: string;
 }
@@ -39,6 +41,11 @@ export class HasManyClass<T extends IDAble> {
 export function hasMany<T>(table: string, link: keyof T): HasManyType {
   return { type: "hasmany", table, link: link as string };
 }
+
+export function uuid(): FieldType {
+  return { type: "field", default: uuidGen };
+}
+
 export function field(): FieldType {
   return { type: "field" };
 }
@@ -56,6 +63,7 @@ interface StaticModelProps {
 
 interface FieldType {
   type: "field";
+  default?: Function;
 }
 
 // has many creates a seperate table to track the relationship
@@ -117,7 +125,7 @@ interface ModelFunctionConstructor<A extends IDAble, R> {
 }
 type Constructor<A extends IDAble, R, T> = ModelFunctionConstructor<A, R> & T;
 
-type StaticModel<T extends IDAble> = Constructor<
+export type StaticModel<T extends IDAble> = Constructor<
   T,
   Model<T> & T,
   StaticModelProps
@@ -149,8 +157,21 @@ export function createClass<Fields extends IDAble>(
         return this;
       }
 
+      Object.keys(fields).forEach(name => {
+        const field = (fields as any)[name] as FieldTypes;
+        switch (field.type) {
+          case "field":
+            if (field.default !== undefined) {
+              if ((this as any)[name] === undefined) {
+                (this as any)[name] = field.default();
+              }
+            }
+            break;
+        }
+      });
+
       const links = Object.entries(fields)
-        .filter(value => value[1].type !== "field")
+        .filter(value => value[1].type === "hasmany")
         .reduce(
           (newLinks, current) => {
             const linkFunc = getHelper(current[1]);
@@ -203,7 +224,7 @@ export class Table<Item extends IDAble> {
     return this.itemsByID[id];
   };
 
-  public create = (args?: Partial<Item> & IDAble): Model<Item> & Item => {
+  public create = (args?: Partial<Item>): Model<Item> & Item => {
     const item = new this.model({ ...args }, this, { session: this.session });
     this.itemsByID[item.id] = item;
     return item;

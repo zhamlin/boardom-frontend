@@ -1,4 +1,5 @@
 import {
+  Action,
   applyMiddleware,
   combineReducers,
   compose,
@@ -7,10 +8,8 @@ import {
 } from "redux";
 import asyncDispatchMiddleware from "middleware/asyncDispatch";
 import Queue from "offline/queue";
-import lists, {
-  initState as listsInit,
-  State as ListsState
-} from "./lists/reducer";
+import lists from "./lists/reducer";
+import { initState as listsInit, State as ListsState } from "./lists/models";
 
 import { composeWithDevTools } from "redux-devtools-extension";
 import { createOffline } from "@redux-offline/redux-offline";
@@ -62,7 +61,8 @@ const {
       return;
     }
     try {
-      return await effect(action.payload);
+      const result = await effect(action.payload);
+      return result;
     } catch (err) {
       console.log(err);
       if ("type" in err && err.type === "basic") {
@@ -83,9 +83,17 @@ const createReducer = () => {
     lists
   });
 
+  // handle passing other reducer state in to reducers
+  const reducer = (state: State, action: Action<unknown>) => {
+    (state.lists as any).offline = state.offline!;
+    const newState = rootReducer(state, action) as any;
+    delete newState.lists.offline;
+    return newState;
+  };
+
   const persistedReducer = persistReducer(
     persistConfig,
-    offlineEnhanceReducer(rootReducer)
+    offlineEnhanceReducer(reducer)
   );
   return persistedReducer;
 };
@@ -104,11 +112,7 @@ export function makeStore(
     state as any,
     composeEnhancers(
       offlineEnhanceStore as any,
-      applyMiddleware(
-        invariant(),
-        offlineMiddleware,
-        asyncDispatchMiddleware
-      ) as any
+      applyMiddleware(offlineMiddleware, asyncDispatchMiddleware) as any
     )
   );
 
