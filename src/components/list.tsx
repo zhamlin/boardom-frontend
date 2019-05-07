@@ -139,8 +139,7 @@ const makeMapState: MemoizedPropsState<State, LocalProps, StateProps> = () => {
 };
 
 const mapDispatchToProps: DispatchProps = {
-  onAddCard: (id: string, name: string) =>
-    createCard({ id: "", name, listID: id }),
+  onAddCard: (id: string, name: string) => createCard({ name, listID: id }),
   onListNameChange: (id: string, name: string) => updateListName({ id, name })
 };
 
