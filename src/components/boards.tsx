@@ -39,21 +39,28 @@ export const Boards: React.FC<Props> = ({
     <>
       <h2 className="is-size-6 has-text-white">Select or create a board</h2>
       <br />
-      <div className="tile is-ancestor">
-        <div className="tile">
-          {boards.map(b => {
-            return (
-              <article key={b.id} className="tile is-child notification is-2">
-                <Link to={`${path}/${b.id}`} className="title">
-                  {b.name}
-                </Link>
-              </article>
-            );
-          })}
-          <button onClick={handleNewBoard} className="button">
-            New Board
-          </button>
-        </div>
+      <div
+        style={{
+          display: "grid",
+          gridTemplateColumns: "repeat(6, 200px)",
+          gridTemplateRows: "repeat(4, 100px)",
+          gridAutoFlow: "column",
+          gridGap: "10px",
+          overflow: "auto"
+        }}
+      >
+        {boards.map(b => {
+          return (
+            <article key={b.id} className="notification is-1">
+              <Link to={`${path}/${b.id}`} className="title">
+                {b.name}
+              </Link>
+            </article>
+          );
+        })}
+        <button onClick={handleNewBoard} className="button">
+          New Board
+        </button>
       </div>
     </>
   );
