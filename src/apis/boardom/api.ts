@@ -115,13 +115,13 @@ export interface TrelloBoard {
    * @type {Date}
    * @memberof TrelloBoard
    */
-  createdAt?: Date;
+  created_at?: Date;
   /**
    *
    * @type {Date}
    * @memberof TrelloBoard
    */
-  updatedAt?: Date;
+  updated_at?: Date;
   /**
    *
    * @type {string}
