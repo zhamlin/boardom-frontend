@@ -15,19 +15,17 @@ export interface CreateList {
 }
 export const createList = actionList.newAction<CreateList>(CREATE_LIST);
 
-export const UPDATE_LIST_NAME = "UPDATE_LIST_NAME";
-export interface UpdateListName {
-  type: typeof UPDATE_LIST_NAME;
+export const UPDATE_LIST = "UPDATE_LIST";
+export interface UpdateList {
+  type: typeof UPDATE_LIST;
   payload: {
     name: string;
     id: string;
   };
 }
-export const updateListName = actionList.newAction<UpdateListName>(
-  UPDATE_LIST_NAME
-);
+export const updateList = actionList.newAction<UpdateList>(UPDATE_LIST);
 
-export const CREATE_CARD = "CREATE_CARD";
+export const CREATE_CARD = "CREATE_LISTITEM";
 export interface CreateCard {
   type: typeof CREATE_CARD;
   payload: {
@@ -125,6 +123,6 @@ export type ActionsType =
   | UpdateBoard
   | UpdateBoardSuccess
   | UpdateBoardRollback
-  | UpdateListName
+  | UpdateList
   | MoveCard
   | MoveList;

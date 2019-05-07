@@ -10,7 +10,7 @@ import { MemoizedPropsState } from "./types";
 
 import { connect } from "react-redux";
 import { State } from "stores";
-import { createCard, updateListName } from "stores/lists/actions";
+import { createCard, updateList } from "stores/lists/actions";
 
 export interface LocalProps {
   id: string;
@@ -140,7 +140,7 @@ const makeMapState: MemoizedPropsState<State, LocalProps, StateProps> = () => {
 
 const mapDispatchToProps: DispatchProps = {
   onAddCard: (id: string, name: string) => createCard({ name, listID: id }),
-  onListNameChange: (id: string, name: string) => updateListName({ id, name })
+  onListNameChange: (id: string, name: string) => updateList({ id, name })
 };
 
 export default connect(

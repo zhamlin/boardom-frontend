@@ -84,6 +84,7 @@ function createCRUDReducer(
           // allow us to update when the server responds
           action.payload.id = item.id;
         }
+
         if (overrides && overrides["CREATE"] !== undefined) {
           overrides["CREATE"](sess, action, item);
         }
@@ -112,11 +113,11 @@ function createCRUDReducer(
   };
 }
 
-// combine with actionsList, return the action and reducer
-createCRUDReducer(ListItemModel, database, {
+export const listItemReducer = createCRUDReducer(ListItemModel, database, {
   CREATE: (sess: any, action: any, item: any) => {
     const list = sess.List.get(action.payload.listID);
     item.position = list.cards().all().length;
   }
 });
-export const test = createCRUDReducer(BoardModel, database);
+export const boardModelReducer = createCRUDReducer(BoardModel, database);
+export const listModelReducer = createCRUDReducer(ListModel, database);

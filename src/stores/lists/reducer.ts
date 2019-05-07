@@ -1,21 +1,13 @@
 import { filterActions, UnreachableCaseError } from "../../util";
-import {
-  actionList,
-  ActionsType,
-  CREATE_BOARD,
-  CREATE_BOARD_ROLLBACK,
-  CREATE_BOARD_SUCCESS,
-  CREATE_CARD,
-  CREATE_LIST,
-  MOVE_CARD,
-  MOVE_LIST,
-  UPDATE_BOARD,
-  UPDATE_BOARD_ROLLBACK,
-  UPDATE_BOARD_SUCCESS,
-  UPDATE_LIST_NAME
-} from "./actions";
+import { actionList, ActionsType, MOVE_CARD, MOVE_LIST } from "./actions";
 
-import { database, State, test } from "./models";
+import {
+  database,
+  State,
+  boardModelReducer,
+  listItemReducer,
+  listModelReducer
+} from "./models";
 
 function updatePosition<T extends { position: number }>(
   items: T[],
@@ -36,7 +28,9 @@ function order<T extends { position: number }>(items: T[]) {
 }
 
 function reducer(state: Readonly<State>, action: ActionsType): State {
-  state = test(state, action);
+  state = boardModelReducer(state, action);
+  state = listItemReducer(state, action);
+  state = listModelReducer(state, action);
   const sess = database.session(state.db);
   switch (action.type) {
     case MOVE_CARD: {
@@ -85,41 +79,6 @@ function reducer(state: Readonly<State>, action: ActionsType): State {
         db: database.commit(sess)
       };
     }
-
-    case UPDATE_LIST_NAME: {
-      sess.List.get(action.payload.id)!.update(action.payload);
-      return {
-        ...state,
-        db: database.commit(sess)
-      };
-    }
-
-    case CREATE_CARD: {
-      const list = sess.List.get(action.payload.listID)!;
-      const c = sess.ListItem.create({
-        ...action.payload,
-        position: list.cards().all().length
-      });
-      action.payload.id = c.id;
-      return {
-        ...state,
-        db: database.commit(sess)
-      };
-    }
-
-    case CREATE_LIST: {
-      const l = sess.List.create({
-        ...action.payload,
-        position: sess.List.all().length
-      });
-      action.payload.id = l.id;
-
-      return {
-        ...state,
-        db: database.commit(sess)
-      };
-    }
-
     // default:
     // throw new UnreachableCaseError(action);
   }
